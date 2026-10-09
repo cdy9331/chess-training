@@ -21,6 +21,7 @@ export const routes: RouteObject[] = [
       { path: 'puzzles', element: <PuzzlesPage /> },
       { path: 'openings', element: <OpeningsPage /> },
       { path: 'lessons', element: <LessonsPage /> },
+      { path: 'lessons/:lessonId', element: <LessonsPage /> },
       { path: 'analysis', element: <AnalysisPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

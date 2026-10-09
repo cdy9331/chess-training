@@ -1,7 +1,20 @@
-import { PagePlaceholder } from '../../shared/PagePlaceholder';
+import { Link, useParams } from 'react-router';
+import { findLesson } from '../../content/lessons';
+import { LessonList } from './LessonList';
+import { LessonView } from './LessonView';
+import styles from './Lessons.module.css';
 
 export function LessonsPage() {
-  return (
-    <PagePlaceholder title="레슨" description="중반 전략과 엔드게임을 단계별로 배워요." phase={7} />
-  );
+  const { lessonId } = useParams();
+  if (!lessonId) return <LessonList />;
+  const lesson = findLesson(lessonId);
+  if (!lesson) {
+    return (
+      <section className={styles.page}>
+        <h1 className={styles.title}>레슨을 찾을 수 없어요</h1>
+        <Link to="/lessons">← 레슨 목록</Link>
+      </section>
+    );
+  }
+  return <LessonView key={lesson.id} lesson={lesson} />;
 }

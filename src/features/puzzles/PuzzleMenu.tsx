@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BEGINNER_THEMES, type Glicko, type PuzzleIndex } from '../../core/puzzles';
 import { puzzlesRepo } from '../../db/repos/puzzles';
-import { puzzleLoader } from './puzzleData';
+import { puzzleLoader } from '../../shared/puzzleData';
 import type { PuzzleMode } from './puzzleMode';
 import styles from './Puzzles.module.css';
 

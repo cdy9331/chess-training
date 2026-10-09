@@ -40,7 +40,8 @@ describe('engineCache', () => {
     expect(await cache.get('없음')).toBeUndefined();
   });
 
-  it('한도를 넘으면 오래된 것부터 지운다', async () => {
+  // 기록 2만 개를 넣는 테스트라 전체 테스트를 함께 돌리면 기본 제한(5초)을 넘길 수 있다
+  it('한도를 넘으면 오래된 것부터 지운다', { timeout: 30_000 }, async () => {
     const db = newDb();
     const cache = createEngineCache(db);
     const records = Array.from({ length: 20_010 }, (_, i) => ({

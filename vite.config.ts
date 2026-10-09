@@ -9,6 +9,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // 테스트 파일이 많아지면서 전체 실행 시 jsdom 준비 등으로 5초 기본 제한을 넘기는 경우가 생겼다
+    testTimeout: 15_000,
     css: { modules: { classNameStrategy: 'non-scoped' } },
   },
 });

@@ -17,7 +17,7 @@ import {
 import { puzzlesRepo } from '../../db/repos/puzzles';
 import { useTimers } from '../../shared/useTimers';
 import { Board, type BoardArrow } from '../board/Board';
-import { puzzleLoader } from './puzzleData';
+import { puzzleLoader } from '../../shared/puzzleData';
 import { criteriaFor, type PuzzleMode } from './puzzleMode';
 import styles from './Puzzles.module.css';
 

@@ -25,7 +25,7 @@ import { useMoveNavigationKeys } from '../board/useMoveNavigationKeys';
 import { OpeningLabel } from '../../shared/OpeningLabel';
 import { buildGamePgn } from './gamePgn';
 import styles from './Play.module.css';
-import { useAiOpponent } from './useAiOpponent';
+import { useAiOpponent } from '../board/engine/useAiOpponent';
 
 /** AI가 너무 빨리 두면 수를 알아보기 어려우므로 최소한 이만큼은 기다린다. */
 const MIN_AI_THINK_MS = 600;

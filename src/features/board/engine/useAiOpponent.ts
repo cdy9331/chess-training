@@ -5,8 +5,8 @@ import {
   type EngineClient,
   type LevelConfig,
   type Score,
-} from '../../core/engine';
-import { useLazyEngineClient } from '../board/engine/useLazyEngineClient';
+} from '../../../core/engine';
+import { useLazyEngineClient } from './useLazyEngineClient';
 
 /** AI 상대 엔진. 레벨 설정은 엔진을 처음 쓸 때 한 번 적용된다. */
 export function useAiOpponent(config: LevelConfig) {

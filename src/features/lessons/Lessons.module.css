@@ -1,0 +1,278 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1080px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.small {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-accent-strong);
+}
+
+.primaryLink {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ---------- 목록 ---------- */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupTitle {
+  margin: 8px 0 0;
+  font-size: 1.2rem;
+}
+
+.lessonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lessonCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+}
+
+.lessonCard:hover {
+  border-color: var(--color-accent);
+}
+
+.completed {
+  border-color: var(--color-best);
+}
+
+.cardMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+/* ---------- 레슨 진행 ---------- */
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stepDot {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.stepDone {
+  border-color: var(--color-best);
+  color: var(--color-best);
+}
+
+.stepCurrent,
+.stepCurrent:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 560px) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.boardColumn {
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.textBox {
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  line-height: 1.65;
+}
+
+.textBox p {
+  margin: 0 0 8px;
+}
+
+.textBox p:last-child {
+  margin-bottom: 0;
+}
+
+.stepTitle {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.tips {
+  margin: 8px 0 0;
+  padding-left: 1.2em;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.counter {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.good {
+  margin: 0;
+  color: var(--color-best);
+  font-weight: 700;
+}
+
+.bad {
+  margin: 0;
+  color: var(--color-blunder);
+  font-weight: 600;
+}
+
+.hintText {
+  margin: 0;
+  color: var(--color-accent-strong);
+}
+
+.successBox,
+.failBox,
+.revealBox {
+  padding: 12px 14px;
+  border: 2px solid;
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.successBox p,
+.failBox p,
+.revealBox p {
+  margin: 6px 0 0;
+}
+
+.successBox {
+  border-color: var(--color-best);
+}
+
+.failBox {
+  border-color: var(--color-mistake);
+}
+
+.revealBox {
+  border-color: var(--color-inaccuracy);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.navRow {
+  display: flex;
+  justify-content: space-between;
+  max-width: 560px;
+}
+
+.finishCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border: 2px solid var(--color-best);
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.finishTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.puzzleStep {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.levelFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.levelFilter button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-weight: 700;
+}
+
+.levelBadge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-hover);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

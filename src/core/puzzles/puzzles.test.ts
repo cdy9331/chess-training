@@ -7,6 +7,7 @@ import {
   glicko2,
   INITIAL_PUZZLE_RATING,
   parsePuzzleShard,
+  pickLessonPuzzles,
   puzzleColor,
   selectPuzzle,
   startPuzzle,
@@ -167,6 +168,18 @@ describe('퍼즐 고르기', () => {
     const { loader: l } = loader();
     const puzzle = await selectPuzzle(l, { targetRating: 900, theme: 'pin' }, seededRandom(1));
     expect(puzzle?.id).toBe('p1500');
+  });
+
+  it('레슨용: 주제가 맞고 레이팅 상한 이하인 퍼즐을 쉬운 순서로', async () => {
+    const { loader: l } = loader();
+    const picked = await pickLessonPuzzles(
+      l,
+      { themes: ['mateIn1', 'mateIn2'], count: 5, maxRating: 1000 },
+      seededRandom(1),
+    );
+    expect(picked.map((p) => p.id)).toEqual(['p600', 'p900']);
+    const none = await pickLessonPuzzles(l, { themes: ['zugzwang'], count: 3 }, seededRandom(1));
+    expect(none).toEqual([]);
   });
 
   it('제외 목록의 퍼즐은 고르지 않고, 모두 제외되면 다시 고른다', async () => {

@@ -68,6 +68,15 @@ export interface CustomLineRecord {
   createdAt: number;
 }
 
+export interface LessonProgressRecord {
+  lessonId: string;
+  /** 다음에 이어서 볼 단계 (0부터) */
+  stepIndex: number;
+  /** 모든 단계를 마친 시각 */
+  completedAt?: number;
+  updatedAt: number;
+}
+
 /** 여러 기능이 쓰는 작은 설정·상태 값 (퍼즐 레이팅 등) */
 export interface KeyValueRecord {
   key: string;
@@ -82,6 +91,7 @@ export type ChessTrainingDb = Dexie & {
   kv: EntityTable<KeyValueRecord, 'key'>;
   openingProgress: EntityTable<OpeningProgressRecord, 'lineId'>;
   customLines: EntityTable<CustomLineRecord, 'id'>;
+  lessonProgress: EntityTable<LessonProgressRecord, 'lessonId'>;
 };
 
 export function createDb(name = 'chess-training'): ChessTrainingDb {
@@ -107,6 +117,10 @@ export function createDb(name = 'chess-training'): ChessTrainingDb {
   // v5: 탐색기에서 저장한 내 연습 라인 (새 테이블만 추가)
   db.version(5).stores({
     customLines: 'id, createdAt',
+  });
+  // v6: 레슨 진도 (새 테이블만 추가)
+  db.version(6).stores({
+    lessonProgress: 'lessonId',
   });
   return db;
 }
