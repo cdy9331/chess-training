@@ -1,0 +1,165 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 1080px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-blunder);
+}
+
+.notice {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: 0.92rem;
+}
+
+.empty {
+  padding: 24px;
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.empty p {
+  margin: 0 0 8px;
+}
+
+.gameList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gameItem {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.gameLink {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+}
+
+.gameLink:hover {
+  border-color: var(--color-accent);
+}
+
+.gameMain {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gameDate {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.resultBadge {
+  flex: none;
+  min-width: 3.2em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+
+.win {
+  background: var(--color-best);
+}
+
+.loss {
+  background: var(--color-mistake);
+}
+
+.draw {
+  background: var(--color-inaccuracy);
+}
+
+.ongoing {
+  background: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.deleteButton {
+  flex: none;
+  padding: 0 12px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 600px) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.boardColumn {
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.navButtons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.pgn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gameDate {
+    display: none;
+  }
+}

@@ -61,7 +61,7 @@
 | 체스 규칙   | `chess.js` (v1.x)                                                              | 합법 수, FEN/PGN, 종료 판정                                                                                                 |
 | 체스판 UI   | `react-chessboard`                                                             | **메이저 버전을 고정**(v4→v5에서 props API가 바뀜). 설치 시점 문서 기준으로 래퍼 작성                                       |
 | 엔진        | `stockfish` npm 패키지(nmrugg/stockfish.js)의 **lite single-thread WASM 빌드** | 엔진 JS 파일 자체가 Worker 스크립트 → `new Worker(url)`로 실행. 단일 스레드 빌드는 COOP/COEP 헤더 불필요 → 정적 호스팅 호환 |
-| 상태 관리   | `zustand`                                                                      | 페이지 단위 스토어                                                                                                          |
+| 상태 관리   | `zustand`                                                                      | 페이지 단위 스토어. Phase 3까지는 React state로 충분해서 아직 설치하지 않음 (여러 화면이 상태를 공유할 때 도입)                |
 | 저장소      | IndexedDB + `dexie`                                                            | 스키마 버전 관리, 쿼리 편의                                                                                                 |
 | 라우팅      | `react-router`                                                                 | 정적 호스팅 대비 HashRouter 또는 404 fallback                                                                               |
 | 스타일      | CSS Modules + CSS 변수(라이트/다크 테마)                                       | 의존성 최소화                                                                                                               |

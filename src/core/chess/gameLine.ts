@@ -46,6 +46,17 @@ export function playMove(line: GameLine, ply: number, uci: string): GameLine | n
   return { ...line, moves: [...line.moves.slice(0, ply), played] };
 }
 
+/** 저장된 UCI 수순으로 GameLine을 다시 만든다. 불법 수를 만나면 그 직전까지만. */
+export function lineFromUcis(startFen: string, ucis: readonly string[]): GameLine {
+  let line = createLine(startFen);
+  for (const uci of ucis) {
+    const next = playMove(line, line.moves.length, uci);
+    if (!next) break;
+    line = next;
+  }
+  return line;
+}
+
 export function truncate(line: GameLine, ply: number): GameLine {
   return { ...line, moves: line.moves.slice(0, Math.max(0, ply)) };
 }

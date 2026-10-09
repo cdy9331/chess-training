@@ -17,6 +17,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <DashboardPage /> },
       { path: 'play', element: <PlayPage /> },
       { path: 'review', element: <ReviewPage /> },
+      { path: 'review/:gameId', element: <ReviewPage /> },
       { path: 'puzzles', element: <PuzzlesPage /> },
       { path: 'openings', element: <OpeningsPage /> },
       { path: 'lessons', element: <LessonsPage /> },

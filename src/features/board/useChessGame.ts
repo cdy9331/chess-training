@@ -24,8 +24,12 @@ export interface ChessGame {
   isAtEnd: boolean;
   /** 현재 보고 있는 국면에서 수를 둔다. 이후 수가 있었다면 대체된다. */
   makeMove: (uci: string) => boolean;
+  /** 보고 있는 위치와 상관없이 마지막 수 뒤에 수를 두고 마지막 국면으로 이동한다. (AI 응수용) */
+  appendMove: (uci: string) => boolean;
   /** 마지막 수를 취소한다. */
   undo: () => void;
+  /** 처음 plyCount개의 수만 남긴다. */
+  truncateTo: (plyCount: number) => void;
   goTo: (ply: number) => void;
   goFirst: () => void;
   goPrev: () => void;
@@ -55,6 +59,23 @@ export function useChessGame(initialLine: GameLine = createLine()): ChessGame {
     [line, ply],
   );
 
+  const appendMove = useCallback(
+    (uci: string) => {
+      const next = playMove(line, line.moves.length, uci);
+      if (!next) return false;
+      setState({ line: next, ply: next.moves.length });
+      return true;
+    },
+    [line],
+  );
+
+  const truncateTo = useCallback((plyCount: number) => {
+    setState((s) => {
+      const shorter = truncate(s.line, plyCount);
+      return { line: shorter, ply: shorter.moves.length };
+    });
+  }, []);
+
   const goTo = useCallback((target: number) => {
     setState((s) => ({ ...s, ply: Math.max(0, Math.min(target, s.line.moves.length)) }));
   }, []);
@@ -82,7 +103,9 @@ export function useChessGame(initialLine: GameLine = createLine()): ChessGame {
     lastMoveUci: ply > 0 ? line.moves[ply - 1]?.uci : undefined,
     isAtEnd: ply === line.moves.length,
     makeMove,
+    appendMove,
     undo,
+    truncateTo,
     goTo,
     goFirst: useCallback(() => goTo(0), [goTo]),
     goPrev: useCallback(() => setState((s) => ({ ...s, ply: Math.max(0, s.ply - 1) })), []),

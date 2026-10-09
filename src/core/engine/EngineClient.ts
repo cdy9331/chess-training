@@ -102,6 +102,14 @@ export class EngineClient {
     });
   }
 
+  /** 새 게임을 시작함을 알린다 (이전 게임의 탐색 정보를 버린다). */
+  async newGame(): Promise<void> {
+    await this.enqueue(async () => {
+      this.transport.send('ucinewgame');
+      await this.request('isready', 'readyok');
+    });
+  }
+
   analyze(fen: string, options: AnalyzeOptions = {}): Promise<AnalysisResult> {
     const { signal } = options;
     if (signal?.aborted) return Promise.reject(new EngineAbortedError());

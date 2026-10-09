@@ -7,6 +7,7 @@ import {
   isPromotionMove,
   isValidFen,
   legalTargets,
+  lineFromUcis,
   lineToPgn,
   parsePgn,
   parsePositionInput,
@@ -96,6 +97,11 @@ describe('gameLine', () => {
     expect(line.moves.map((m) => m.san)).toEqual(['e4', 'e5', 'Nf3']);
     expect(fenAt(line, 0)).toBe(START_FEN);
     expect(fenAt(line, 3)).toBe(line.moves[2]?.fen);
+  });
+
+  it('저장된 수순으로 다시 만들고, 불법 수에서 멈춘다', () => {
+    const line = lineFromUcis(START_FEN, ['e2e4', 'e7e5', 'e1e5', 'g1f3']);
+    expect(line.moves.map((m) => m.san)).toEqual(['e4', 'e5']);
   });
 
   it('불법 수는 거부한다', () => {
