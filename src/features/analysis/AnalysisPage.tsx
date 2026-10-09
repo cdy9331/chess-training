@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { describeStatus, lineToPgn, parseUci, statusToResult } from '../../core/chess';
+import { useSearchParams } from 'react-router';
+import {
+  createLine,
+  describeStatus,
+  lineToPgn,
+  parsePositionInput,
+  parseUci,
+  sideToMove,
+  statusToResult,
+  type GameLine,
+} from '../../core/chess';
 import { Board, type BoardArrow, type Orientation } from '../board/Board';
 import { EngineLines } from '../board/engine/EngineLines';
 import { EvalBar } from '../board/engine/EvalBar';
@@ -12,9 +22,19 @@ import { PositionLoader } from './PositionLoader';
 
 const BEST_MOVE_ARROW_COLOR = 'rgba(30, 110, 200, 0.8)';
 
+/** 주소의 ?fen= 으로 시작 국면을 받는다 (퍼즐 화면 등에서 "분석 보드에서 살펴보기"). */
+function lineFromParam(fen: string | null): GameLine {
+  const parsed = fen ? parsePositionInput(fen) : null;
+  return parsed?.kind === 'fen' ? parsed.line : createLine();
+}
+
 export function AnalysisPage() {
-  const game = useChessGame();
-  const [orientation, setOrientation] = useState<Orientation>('white');
+  const [params] = useSearchParams();
+  const [initialLine] = useState(() => lineFromParam(params.get('fen')));
+  const game = useChessGame(initialLine);
+  const [orientation, setOrientation] = useState<Orientation>(() =>
+    sideToMove(initialLine.startFen) === 'b' ? 'black' : 'white',
+  );
   const [engineEnabled, setEngineEnabled] = useState(true);
   const [copied, setCopied] = useState(false);
   /** 클립보드 권한이 막혀 자동 복사에 실패했을 때 직접 복사하도록 보여줄 PGN */

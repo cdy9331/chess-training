@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
-import { useMemo, useState } from 'react';
+import type { CSSProperties, RefObject } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard, type ChessboardOptions } from 'react-chessboard';
 import type { Square } from 'chess.js';
 import {
@@ -27,6 +27,8 @@ export interface BoardProps {
   lastMoveUci?: string;
   /** 보드 위에 그릴 화살표 (예: 엔진 최선 수) */
   arrows?: BoardArrow[];
+  /** 강조할 칸 (예: 퍼즐 힌트로 움직일 기물) */
+  highlightSquares?: readonly string[];
 }
 
 export interface BoardArrow {
@@ -55,7 +57,37 @@ const SQUARE_STYLES = {
   check: {
     backgroundImage: 'radial-gradient(circle, var(--board-check) 0%, transparent 75%)',
   },
+  highlight: { boxShadow: 'inset 0 0 0 4px var(--board-highlight)' },
+  mark: { backgroundColor: 'var(--board-mark)' },
 } satisfies Record<string, CSSProperties>;
+
+const NO_MARKS: readonly string[] = [];
+
+/**
+ * 체스판이 실제로 화면에 크기를 가지고 있는가.
+ * react-chessboard는 기물 이동 애니메이션 때 칸 너비를 재는데, 너비가 0이면(숨겨진 탭/창,
+ * 크기 0인 레이아웃) 'Square width not found' 예외를 던져 페이지 전체가 멈춘다.
+ * 그래서 크기가 0인 동안에는 애니메이션을 끈다.
+ */
+function useHasSize(ref: RefObject<HTMLElement | null>): boolean {
+  // 확인 전에는 "크기 없음"으로 본다 (숨겨진 창에서는 ResizeObserver 알림이 오지 않을 수 있다).
+  // (ResizeObserver가 없는 테스트 환경에서는 그냥 크기가 있다고 본다)
+  const [hasSize, setHasSize] = useState(() => typeof ResizeObserver === 'undefined');
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const measure = () => setHasSize(el.getBoundingClientRect().width > 0);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    document.addEventListener('visibilitychange', measure);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', measure);
+    };
+  }, [ref]);
+  return hasSize;
+}
 
 export function Board({
   fen,
@@ -64,10 +96,31 @@ export function Board({
   interactive = true,
   lastMoveUci,
   arrows,
+  highlightSquares,
 }: BoardProps) {
   // 선택 상태는 어떤 국면에서 만든 것인지 함께 저장해, 국면이 바뀌면 자동으로 무효가 되게 한다.
   const [selection, setSelection] = useState<{ fen: string; square: Square } | null>(null);
   const [pending, setPending] = useState<PendingPromotion | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const hasSize = useHasSize(wrapperRef);
+  // 우클릭으로 표시한 칸 (생각을 정리하는 용도). 국면이 바뀌면 사라진다.
+  const [marks, setMarks] = useState<{ fen: string; squares: readonly string[] }>({
+    fen,
+    squares: [],
+  });
+  const markedSquares = marks.fen === fen ? marks.squares : NO_MARKS;
+
+  function toggleMark(square: string) {
+    setMarks((m) => {
+      const current = m.fen === fen ? m.squares : [];
+      return {
+        fen,
+        squares: current.includes(square)
+          ? current.filter((s) => s !== square)
+          : [...current, square],
+      };
+    });
+  }
 
   const canMove = interactive && onMove !== undefined;
   const turn = sideToMove(fen);
@@ -107,6 +160,12 @@ export function Board({
     }
     const checked = checkedKingSquare(fen);
     if (checked) result[checked] = { ...result[checked], ...SQUARE_STYLES.check };
+    for (const square of markedSquares) {
+      result[square] = { ...result[square], ...SQUARE_STYLES.mark };
+    }
+    for (const square of highlightSquares ?? []) {
+      result[square] = { ...result[square], ...SQUARE_STYLES.highlight };
+    }
     if (selected) {
       result[selected] = SQUARE_STYLES.selected;
       for (const t of targets) {
@@ -117,7 +176,7 @@ export function Board({
       }
     }
     return result;
-  }, [fen, lastMoveUci, selected, targets]);
+  }, [fen, lastMoveUci, selected, targets, highlightSquares, markedSquares]);
 
   const options: ChessboardOptions = {
     position: fen,
@@ -129,13 +188,17 @@ export function Board({
     allowDrawingArrows: true,
     arrows: arrows?.map((a) => ({ startSquare: a.from, endSquare: a.to, color: a.color })) ?? [],
     animationDurationInMs: 200,
+    showAnimations: hasSize,
     canDragPiece: ({ piece }) => canMove && ownsPiece(piece.pieceType),
     onPieceDrag: () => setSelection(null),
     onPieceDrop: ({ sourceSquare, targetSquare }) => {
       if (!canMove || !targetSquare || sourceSquare === targetSquare) return false;
       return tryMove(sourceSquare as Square, targetSquare as Square);
     },
+    // 우클릭: 칸 표시 켜기/끄기, 우클릭 드래그: 화살표(라이브러리 기능), 왼쪽 클릭: 표시 지우기
+    onSquareRightClick: ({ square }) => toggleMark(square),
     onSquareClick: ({ piece, square }) => {
+      if (markedSquares.length > 0) setMarks({ fen, squares: [] });
       if (!canMove || pendingPromotion) return;
       const sq = square as Square;
       if (selected && targets.some((t) => t.to === sq)) {
@@ -149,9 +212,12 @@ export function Board({
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} ref={wrapperRef}>
       <Chessboard options={options} />
       {pendingPromotion && <PromotionDialog color={turn} onChoose={choosePromotion} />}
+      <p className={styles.markHelp}>
+        🖱 우클릭: 칸 표시 · 우클릭 후 끌기: 화살표 · 왼쪽 클릭: 지우기
+      </p>
     </div>
   );
 }

@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "bandSize": 100,
+  "generatedAt": "2026-10-09",
+  "source": "Lichess puzzle database (CC0) https://database.lichess.org/#puzzles",
+  "bands": [
+    {
+      "band": 400,
+      "file": "r0400.json",
+      "count": 2000
+    },
+    {
+      "band": 500,
+      "file": "r0500.json",
+      "count": 2000
+    },
+    {
+      "band": 600,
+      "file": "r0600.json",
+      "count": 2000
+    },
+    {
+      "band": 700,
+      "file": "r0700.json",
+      "count": 2000
+    },
+    {
+      "band": 800,
+      "file": "r0800.json",
+      "count": 2000
+    },
+    {
+      "band": 900,
+      "file": "r0900.json",
+      "count": 2000
+    },
+    {
+      "band": 1000,
+      "file": "r1000.json",
+      "count": 2000
+    },
+    {
+      "band": 1100,
+      "file": "r1100.json",
+      "count": 2000
+    },
+    {
+      "band": 1200,
+      "file": "r1200.json",
+      "count": 2000
+    },
+    {
+      "band": 1300,
+      "file": "r1300.json",
+      "count": 2000
+    },
+    {
+      "band": 1400,
+      "file": "r1400.json",
+      "count": 2000
+    },
+    {
+      "band": 1500,
+      "file": "r1500.json",
+      "count": 2000
+    },
+    {
+      "band": 1600,
+      "file": "r1600.json",
+      "count": 2000
+    },
+    {
+      "band": 1700,
+      "file": "r1700.json",
+      "count": 2000
+    },
+    {
+      "band": 1800,
+      "file": "r1800.json",
+      "count": 2000
+    },
+    {
+      "band": 1900,
+      "file": "r1900.json",
+      "count": 2000
+    },
+    {
+      "band": 2000,
+      "file": "r2000.json",
+      "count": 2000
+    },
+    {
+      "band": 2100,
+      "file": "r2100.json",
+      "count": 2000
+    }
+  ],
+  "themes": {
+    "backRankMate": 4014,
+    "endgame": 19396,
+    "mate": 15527,
+    "mateIn2": 6939,
+    "rookEndgame": 1869,
+    "short": 18961,
+    "hangingPiece": 4426,
+    "mateIn1": 6050,
+    "oneMove": 6057,
+    "long": 8737,
+    "master": 4829,
+    "mateIn3": 2055,
+    "middlegame": 15305,
+    "queensideAttack": 553,
+    "pillsburysMate": 595,
+    "kingsideAttack": 3159,
+    "operaMate": 436,
+    "crushing": 11481,
+    "advantage": 8868,
+    "pawnEndgame": 604,
+    "advancedPawn": 1589,
+    "bishopEndgame": 332,
+    "promotion": 728,
+    "discoveredAttack": 3663,
+    "queenRookEndgame": 288,
+    "sacrifice": 3770,
+    "fork": 4853,
+    "attackingF2F7": 158,
+    "opening": 1299,
+    "knightEndgame": 241,
+    "masterVsMaster": 422,
+    "arabianMate": 26,
+    "epauletteMate": 136,
+    "queenEndgame": 438,
+    "quietMove": 652,
+    "pin": 3791,
+    "veryLong": 2137,
+    "anastasiaMate": 43,
+    "skewer": 3576,
+    "deflection": 1604,
+    "zugzwang": 140,
+    "doubleBishopMate": 21,
+    "attraction": 1278,
+    "defensiveMove": 1136,
+    "smotheredMate": 81,
+    "exposedKing": 1004,
+    "bodenMate": 16,
+    "discoveredCheck": 1084,
+    "doubleCheck": 254,
+    "xRayAttack": 399,
+    "clearance": 399,
+    "cornerMate": 62,
+    "morphysMate": 56,
+    "mateIn4": 383,
+    "swallowstailMate": 54,
+    "hookMate": 68,
+    "trappedPiece": 114,
+    "superGM": 25,
+    "killBoxMate": 48,
+    "blindSwineMate": 31,
+    "intermezzo": 328,
+    "capturingDefender": 154,
+    "interference": 92,
+    "vukovicMate": 37,
+    "triangleMate": 48,
+    "underPromotion": 5,
+    "dovetailMate": 24,
+    "equality": 16,
+    "collinearMove": 36,
+    "mateIn5": 100,
+    "balestraMate": 14,
+    "enPassant": 44,
+    "castling": 9
+  }
+}

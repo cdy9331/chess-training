@@ -13,8 +13,11 @@ import { getLevel, isAbortError } from '../../core/engine';
 import {
   analyzePosition,
   classifyMove,
+  explainBestMove,
+  explainMistake,
   keyMoments,
   type GameReview,
+  type MoveClass,
   type PositionEval,
 } from '../../core/review';
 import { gamesRepo } from '../../db/repos/games';
@@ -27,7 +30,8 @@ import { MoveList, type MoveAnnotation } from '../board/MoveList';
 import { useChessGame } from '../board/useChessGame';
 import { useMoveNavigationKeys } from '../board/useMoveNavigationKeys';
 import { EvalGraph } from './EvalGraph';
-import { MoveFeedback, type RetryState } from './MoveFeedback';
+import { LinePreview } from './LinePreview';
+import { MoveFeedback, type PreviewKind, type RetryState } from './MoveFeedback';
 import { BEST_ARROW_COLOR, MOVE_CLASS_STYLE } from './moveClassStyle';
 import styles from './Review.module.css';
 import { ReviewSummary } from './ReviewSummary';
@@ -35,6 +39,9 @@ import { useGameReview } from './useGameReview';
 
 /** 다시 두어보기에서 사용자의 수를 판정할 때의 탐색 깊이 */
 const RETRY_DEPTH = 12;
+/** 수순 따라가 보기에서 보여줄 최대 수 */
+const PREVIEW_PLIES = 10;
+const BAD_CLASSES: ReadonlySet<MoveClass> = new Set(['inaccuracy', 'mistake', 'blunder']);
 
 const RESULT_TEXT = { win: '승리', loss: '패배', draw: '무승부' } as const;
 
@@ -72,13 +79,6 @@ function GameReviewView({ game }: { game: GameRecord }) {
   const { state, cancel, restart } = useGameReview(game);
   const review = state.kind === 'done' ? state.review : null;
   const mine = resultFor(game.result, game.playerColor);
-
-  useMoveNavigationKeys({
-    first: replay.goFirst,
-    prev: replay.goPrev,
-    next: replay.goNext,
-    last: replay.goLast,
-  });
 
   return (
     <section className={styles.page}>
@@ -153,6 +153,12 @@ type Replay = ReturnType<typeof useChessGame>;
 
 /** 리뷰가 아직 없을 때: 수순만 다시 보기 */
 function PlainReplay({ game, replay }: { game: GameRecord; replay: Replay }) {
+  useMoveNavigationKeys({
+    first: replay.goFirst,
+    prev: replay.goPrev,
+    next: replay.goNext,
+    last: replay.goLast,
+  });
   return (
     <div className={styles.layout}>
       <div className={styles.boardColumn}>
@@ -211,6 +217,62 @@ function ReviewBody({
   // 다른 수로 이동하면 다시 두어보기는 자동으로 끝난다.
   const activeRetry = retry && move && retry.ply === move.ply ? retry : null;
 
+  // --- 왜? 설명 (엔진 수순을 따라가며 규칙으로 만든 문장) ---
+  const before = move ? review.evals[move.ply - 1] : undefined;
+  const after = move ? review.evals[move.ply] : undefined;
+  const explanation = useMemo(() => {
+    if (!move || !before || !after) return { whyBad: null, whyBest: null };
+    const isBad = BAD_CLASSES.has(move.classification);
+    return {
+      whyBad: isBad
+        ? explainMistake({
+            fenBefore,
+            playedUci: move.uci,
+            mover: move.color,
+            before,
+            after,
+            plyIndex: move.ply - 1,
+          }).reasons
+        : null,
+      whyBest: explainBestMove({ fenBefore, mover: move.color, before, plyIndex: move.ply - 1 })
+        .reasons,
+    };
+  }, [move, before, after, fenBefore]);
+
+  // --- 수순 따라가 보기: 최선 수순 또는 상대의 최선 응수를 체스판에서 한 수씩 ---
+  const [preview, setPreview] = useState<{ ply: number; kind: PreviewKind; step: number } | null>(
+    null,
+  );
+  const activePreview = preview && move && preview.ply === move.ply ? preview : null;
+  const previewLine = useMemo(() => {
+    if (!activePreview || !before || !after) return null;
+    const source = activePreview.kind === 'best' ? before : after;
+    const startFen = activePreview.kind === 'best' ? fenBefore : replay.fen;
+    const pv = source.kind === 'score' ? source.pv.slice(0, PREVIEW_PLIES) : [];
+    return lineFromUcis(startFen, pv);
+  }, [activePreview, before, after, fenBefore, replay.fen]);
+  const previewStep = Math.min(activePreview?.step ?? 0, previewLine?.moves.length ?? 0);
+  const setPreviewStep = (step: number) =>
+    setPreview((p) =>
+      p && previewLine ? { ...p, step: Math.max(0, Math.min(step, previewLine.moves.length)) } : p,
+    );
+  const startPreview = (kind: PreviewKind) => {
+    if (!move) return;
+    setRetry(null);
+    setPreview({ ply: move.ply, kind, step: 1 });
+  };
+
+  useMoveNavigationKeys(
+    previewLine
+      ? {
+          first: () => setPreviewStep(0),
+          prev: () => setPreviewStep(previewStep - 1),
+          next: () => setPreviewStep(previewStep + 1),
+          last: () => setPreviewStep(previewLine.moves.length),
+        }
+      : { first: replay.goFirst, prev: replay.goPrev, next: replay.goNext, last: replay.goLast },
+  );
+
   async function judgeAttempt(uci: string) {
     const before = move ? review.evals[move.ply - 1] : undefined;
     const fenAfter = fenAfterMove(fenBefore, uci);
@@ -268,7 +330,11 @@ function ReviewBody({
   }
 
   const canTryMove = activeRetry?.state.kind === 'waiting' || activeRetry?.state.kind === 'judged';
-  const startRetry = () => move && setRetry({ ply: move.ply, state: { kind: 'waiting' } });
+  const startRetry = () => {
+    if (!move) return;
+    setPreview(null);
+    setRetry({ ply: move.ply, state: { kind: 'waiting' } });
+  };
 
   return (
     <div className={styles.layout}>
@@ -280,7 +346,14 @@ function ReviewBody({
             result={activeRetry ? undefined : evalBarResult(currentEval)}
           />
           <div className={styles.board}>
-            {activeRetry ? (
+            {previewLine ? (
+              <Board
+                fen={fenAt(previewLine, previewStep)}
+                orientation={orientation}
+                lastMoveUci={previewLine.moves[previewStep - 1]?.uci}
+                interactive={false}
+              />
+            ) : activeRetry ? (
               <Board
                 fen={fenBefore}
                 orientation={orientation}
@@ -303,11 +376,32 @@ function ReviewBody({
       </div>
 
       <aside className={styles.panel}>
+        {previewLine && activePreview && (
+          <LinePreview
+            title={
+              activePreview.kind === 'best'
+                ? '최선 수순 따라가 보기'
+                : '상대의 최선 응수 따라가 보기'
+            }
+            line={previewLine}
+            step={previewStep}
+            onStep={setPreviewStep}
+            onClose={() => setPreview(null)}
+          />
+        )}
         <MoveFeedback
+          key={move?.ply ?? 0}
           move={move}
           fenBefore={fenBefore}
           evalAfter={currentEval}
           isMine={move?.color === player}
+          whyBad={explanation.whyBad}
+          whyBest={explanation.whyBest}
+          canPreview={{
+            best: before?.kind === 'score' && before.pv.length > 0,
+            refutation: after?.kind === 'score' && after.pv.length > 0,
+          }}
+          onPreview={startPreview}
           retry={activeRetry?.state ?? null}
           onStartRetry={startRetry}
           onRetryAgain={startRetry}

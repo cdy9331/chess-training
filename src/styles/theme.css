@@ -18,6 +18,8 @@
   --board-selected: rgb(20 85 30 / 0.5);
   --board-target: rgb(20 85 30 / 0.45);
   --board-check: rgb(230 30 30 / 0.9);
+  --board-highlight: rgb(30 110 200 / 0.85);
+  --board-mark: rgb(235 97 80 / 0.8);
 
   /* 수 등급 색 (Phase 4 리뷰에서 사용) */
   --color-best: #5b9a3c;

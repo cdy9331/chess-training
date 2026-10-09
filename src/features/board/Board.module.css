@@ -3,6 +3,13 @@
   width: 100%;
 }
 
+.markHelp {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
 .promotionOverlay {
   position: absolute;
   inset: 0;

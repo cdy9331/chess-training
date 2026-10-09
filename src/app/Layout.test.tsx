@@ -19,8 +19,9 @@ describe('앱 레이아웃', () => {
 
   it('메뉴를 누르면 해당 페이지로 이동한다', async () => {
     renderAt('/');
-    await userEvent.click(screen.getByRole('link', { name: /퍼즐/ }));
-    expect(screen.getByRole('heading', { level: 1, name: '퍼즐' })).toBeInTheDocument();
+    // 데이터를 불러오지 않는 페이지로 확인한다 (퍼즐 등은 IndexedDB가 필요)
+    await userEvent.click(screen.getByRole('link', { name: /레슨/ }));
+    expect(screen.getByRole('heading', { level: 1, name: '레슨' })).toBeInTheDocument();
   });
 
   it('없는 주소는 안내 페이지를 보여준다', () => {

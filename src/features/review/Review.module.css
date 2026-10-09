@@ -295,6 +295,70 @@
   text-align: center;
 }
 
+.whyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--color-bg);
+}
+
+.whyTitle {
+  margin: 0;
+  font-weight: 700;
+  cursor: default;
+}
+
+summary.whyTitle {
+  cursor: pointer;
+}
+
+.whyList {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.whyList li + li {
+  margin-top: 4px;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 2px solid var(--color-accent);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.preview p {
+  margin: 0;
+}
+
+.previewMoves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.previewMoves button {
+  padding: 3px 8px;
+  font-size: 0.9rem;
+}
+
+.previewActive,
+.previewActive:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
 .momentButtons {
   display: grid;
   grid-template-columns: 1fr 1fr;

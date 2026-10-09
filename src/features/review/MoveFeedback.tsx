@@ -14,11 +14,19 @@ export type RetryState =
   | { kind: 'judged'; attemptSan: string; classification: MoveClass }
   | { kind: 'revealed' };
 
+export type PreviewKind = 'best' | 'refutation';
+
 interface MoveFeedbackProps {
   move: ReviewedMove | null;
   fenBefore: string;
   evalAfter: PositionEval | undefined;
   isMine: boolean;
+  /** 부정확·실수·블런더일 때: 왜 나쁜 수인지 */
+  whyBad: string[] | null;
+  /** 최선의 수가 왜 좋은지 (펼쳐서 볼 때만 보여준다) */
+  whyBest: string[] | null;
+  canPreview: Record<PreviewKind, boolean>;
+  onPreview: (kind: PreviewKind) => void;
   retry: RetryState | null;
   onStartRetry: () => void;
   onRetryAgain: () => void;
@@ -33,6 +41,10 @@ export function MoveFeedback({
   fenBefore,
   evalAfter,
   isMine,
+  whyBad,
+  whyBest,
+  canPreview,
+  onPreview,
   retry,
   onStartRetry,
   onRetryAgain,
@@ -113,12 +125,67 @@ export function MoveFeedback({
         </p>
       )}
       {evalAfter && <p className={styles.muted}>이 수 이후 평가: {formatEval(evalAfter)}</p>}
+
+      {whyBad && whyBad.length > 0 && (
+        <div className={styles.whyBox}>
+          <p className={styles.whyTitle}>❓ 왜 좋지 않은 수인가요?</p>
+          <ul className={styles.whyList}>
+            {whyBad.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+          {canPreview.refutation && (
+            <button type="button" onClick={() => onPreview('refutation')}>
+              ▶ 상대의 최선 응수 따라가 보기
+            </button>
+          )}
+        </div>
+      )}
+
+      {whyBest && whyBest.length > 0 && move.bestMoveSan && (
+        <BestMoveWhy
+          title={isBestPlayed ? '왜 이 수가 최선인가요?' : `${move.bestMoveSan}가 왜 최선인가요?`}
+          reasons={whyBest}
+          canPreview={canPreview.best}
+          onPreview={() => onPreview('best')}
+        />
+      )}
+
       {CAN_RETRY.has(move.classification) && move.bestMoveUci && (
         <button type="button" className={styles.retryButton} onClick={onStartRetry}>
           🎯 더 좋은 수 찾아보기
         </button>
       )}
     </div>
+  );
+}
+
+/** 필요할 때만 펼쳐 보는 "최선의 수 설명" */
+function BestMoveWhy({
+  title,
+  reasons,
+  canPreview,
+  onPreview,
+}: {
+  title: string;
+  reasons: string[];
+  canPreview: boolean;
+  onPreview: () => void;
+}) {
+  return (
+    <details className={styles.whyBox}>
+      <summary className={styles.whyTitle}>💡 {title}</summary>
+      <ul className={styles.whyList}>
+        {reasons.map((reason) => (
+          <li key={reason}>{reason}</li>
+        ))}
+      </ul>
+      {canPreview && (
+        <button type="button" onClick={onPreview}>
+          ▶ 최선 수순 따라가 보기
+        </button>
+      )}
+    </details>
   );
 }
 

@@ -35,10 +35,33 @@ export interface EngineCacheRecord {
   value: PositionEval;
 }
 
+export interface PuzzleAttemptRecord {
+  id: number;
+  puzzleId: string;
+  at: number;
+  solved: boolean;
+  puzzleRating: number;
+  themes: string[];
+  /** 이 퍼즐 전후의 사용자 퍼즐 레이팅 */
+  ratingBefore: number;
+  ratingAfter: number;
+  durationMs: number;
+  /** 힌트나 해답 보기를 썼는가 (썼으면 실패로 계산) */
+  usedHelp: boolean;
+}
+
+/** 여러 기능이 쓰는 작은 설정·상태 값 (퍼즐 레이팅 등) */
+export interface KeyValueRecord {
+  key: string;
+  value: unknown;
+}
+
 export type ChessTrainingDb = Dexie & {
   games: EntityTable<GameRecord, 'id'>;
   reviews: EntityTable<ReviewRecord, 'gameId'>;
   engineCache: EntityTable<EngineCacheRecord, 'key'>;
+  puzzleAttempts: EntityTable<PuzzleAttemptRecord, 'id'>;
+  kv: EntityTable<KeyValueRecord, 'key'>;
 };
 
 export function createDb(name = 'chess-training'): ChessTrainingDb {
@@ -51,6 +74,11 @@ export function createDb(name = 'chess-training'): ChessTrainingDb {
   db.version(2).stores({
     reviews: 'gameId',
     engineCache: 'key, createdAt',
+  });
+  // v3: 퍼즐 풀이 기록과 키-값 저장소 (새 테이블만 추가)
+  db.version(3).stores({
+    puzzleAttempts: '++id, puzzleId, at',
+    kv: 'key',
   });
   return db;
 }
