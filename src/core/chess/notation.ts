@@ -40,6 +40,11 @@ export function playUci(chess: Chess, uci: string): Move | null {
   }
 }
 
+/** fen에서 uci 수를 둔 뒤의 FEN. 불법 수면 null. */
+export function fenAfterMove(fen: string, uci: string): string | null {
+  return playUci(new Chess(fen), uci)?.after ?? null;
+}
+
 export function uciToSan(fen: string, uci: string): string | null {
   return playUci(new Chess(fen), uci)?.san ?? null;
 }

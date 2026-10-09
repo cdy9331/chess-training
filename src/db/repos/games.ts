@@ -78,8 +78,12 @@ export function createGamesRepo(db: ChessTrainingDb = defaultDb) {
       return (await this.list({ status: 'playing' }))[0];
     },
 
+    /** 대국과 그 리뷰를 함께 지운다. */
     async remove(id: number): Promise<void> {
-      await db.games.delete(id);
+      await db.transaction('rw', db.games, db.reviews, async () => {
+        await db.games.delete(id);
+        await db.reviews.delete(id);
+      });
     },
   };
 }

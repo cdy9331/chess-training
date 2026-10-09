@@ -154,6 +154,210 @@
   font-size: 0.85rem;
 }
 
+.small {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
+
+.linkButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+/* ---------- 리뷰 ---------- */
+.progressBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.progressBox p {
+  margin: 0;
+}
+
+.progressBox progress {
+  width: 100%;
+  height: 10px;
+  accent-color: var(--color-accent);
+}
+
+.boardWithBar {
+  display: flex;
+  gap: 8px;
+}
+
+.board {
+  flex: 1;
+  min-width: 0;
+}
+
+.graph {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.graphBlack {
+  fill: #403d39;
+}
+
+.graphWhite {
+  fill: #f2f2f2;
+}
+
+.graphMid {
+  stroke: #888;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.graphCursor {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.graphDot {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.feedback p {
+  margin: 0;
+}
+
+.feedbackTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.feedbackActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bestLine {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.retryButton {
+  align-self: flex-start;
+  border-color: var(--color-accent);
+  color: var(--color-accent-strong);
+  font-weight: 600;
+}
+
+.retryCorrect {
+  color: var(--color-best);
+}
+
+.retryWrong {
+  color: var(--color-mistake);
+}
+
+.classBadge {
+  display: inline-block;
+  min-width: 1.8em;
+  margin-right: 6px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.momentButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.accuracyRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.accuracyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--color-bg);
+}
+
+.accuracyLabel {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.accuracyValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.countTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.countTable th,
+.countTable td {
+  padding: 4px 6px;
+  text-align: center;
+}
+
+.countTable tbody th {
+  text-align: left;
+  font-weight: 500;
+}
+
+.countTable tbody tr + tr {
+  border-top: 1px solid var(--color-border);
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);

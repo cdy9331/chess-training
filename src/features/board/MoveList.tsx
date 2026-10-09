@@ -8,6 +8,15 @@ interface MoveListProps {
   /** 현재 보고 있는 ply (0 = 시작 국면) */
   currentPly: number;
   onSelectPly: (ply: number) => void;
+  /** ply별 표시 (예: 리뷰의 수 등급 기호) */
+  annotations?: Readonly<Record<number, MoveAnnotation>>;
+}
+
+export interface MoveAnnotation {
+  symbol: string;
+  /** CSS 색 (CSS 변수 가능) */
+  color: string;
+  label: string;
 }
 
 interface MoveRow {
@@ -42,7 +51,7 @@ function buildRows(startFen: string, moves: readonly PlayedMove[]): MoveRow[] {
   return rows;
 }
 
-export function MoveList({ startFen, moves, currentPly, onSelectPly }: MoveListProps) {
+export function MoveList({ startFen, moves, currentPly, onSelectPly, annotations }: MoveListProps) {
   const listRef = useRef<HTMLOListElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
 
@@ -69,15 +78,22 @@ export function MoveList({ startFen, moves, currentPly, onSelectPly }: MoveListP
   const renderMove = (entry: MoveRow['white']) => {
     if (!entry) return <span className={styles.cell}>…</span>;
     const active = entry.ply === currentPly;
+    const note = annotations?.[entry.ply];
     return (
       <button
         type="button"
         ref={active ? activeRef : undefined}
         className={`${styles.cell} ${styles.move} ${active ? styles.active : ''}`}
         aria-current={active ? 'step' : undefined}
+        aria-label={note ? `${entry.san} (${note.label})` : undefined}
         onClick={() => onSelectPly(entry.ply)}
       >
         {entry.san}
+        {note && (
+          <span className={styles.annotation} style={{ backgroundColor: note.color }} aria-hidden>
+            {note.symbol}
+          </span>
+        )}
       </button>
     );
   };
