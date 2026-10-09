@@ -22,7 +22,10 @@ import {
 } from '../../core/review';
 import { gamesRepo } from '../../db/repos/games';
 import type { GameRecord } from '../../db/schema';
+import { bookDepth } from '../../core/openings';
 import { formatDateTime } from '../../shared/format';
+import { OpeningLabel } from '../../shared/OpeningLabel';
+import { useOpeningBook } from '../../shared/useOpeningBook';
 import { Board, type BoardArrow } from '../board/Board';
 import { EvalBar } from '../board/engine/EvalBar';
 import { useLazyEngineClient } from '../board/engine/useLazyEngineClient';
@@ -303,8 +306,18 @@ function ReviewBody({
   const prevMoment = moments.filter((m) => m.ply < replay.ply).at(-1);
   const nextMoment = moments.find((m) => m.ply > replay.ply);
 
+  // 처음부터 Lichess 오프닝 데이터 안에 있는 수 = 이론수
+  const book = useOpeningBook();
+  const theoryDepth = book ? bookDepth(book, replay.line) : 0;
+  const isTheory = (m: { ply: number; classification: MoveClass }) =>
+    m.ply <= theoryDepth && !BAD_CLASSES.has(m.classification);
+
   const annotations: Record<number, MoveAnnotation> = {};
   for (const m of review.moves) {
+    if (isTheory(m)) {
+      annotations[m.ply] = { symbol: '📖', color: 'var(--color-book)', label: '이론수' };
+      continue;
+    }
     // '좋음'까지 표시하면 기보가 복잡해져서 생략한다.
     if (m.classification === 'good') continue;
     const s = MOVE_CLASS_STYLE[m.classification];
@@ -395,6 +408,7 @@ function ReviewBody({
           fenBefore={fenBefore}
           evalAfter={currentEval}
           isMine={move?.color === player}
+          isTheory={move ? isTheory(move) : false}
           whyBad={explanation.whyBad}
           whyBest={explanation.whyBest}
           canPreview={{
@@ -408,6 +422,8 @@ function ReviewBody({
           onReveal={() => move && setRetry({ ply: move.ply, state: { kind: 'revealed' } })}
           onExitRetry={() => setRetry(null)}
         />
+
+        <OpeningLabel line={replay.line} uptoPly={replay.ply} />
 
         <div className={styles.momentButtons}>
           <button

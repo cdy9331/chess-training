@@ -21,6 +21,8 @@ interface MoveFeedbackProps {
   fenBefore: string;
   evalAfter: PositionEval | undefined;
   isMine: boolean;
+  /** 오프닝 데이터에 있는 정석 수순 안의 수 */
+  isTheory: boolean;
   /** 부정확·실수·블런더일 때: 왜 나쁜 수인지 */
   whyBad: string[] | null;
   /** 최선의 수가 왜 좋은지 (펼쳐서 볼 때만 보여준다) */
@@ -41,6 +43,7 @@ export function MoveFeedback({
   fenBefore,
   evalAfter,
   isMine,
+  isTheory,
   whyBad,
   whyBest,
   canPreview,
@@ -101,12 +104,21 @@ export function MoveFeedback({
   return (
     <div className={styles.feedback} style={{ borderColor: style.color }}>
       <p className={styles.feedbackTitle}>
-        <span className={styles.classBadge} style={{ backgroundColor: style.color }}>
-          {style.symbol}
+        <span
+          className={styles.classBadge}
+          style={{ backgroundColor: isTheory ? 'var(--color-book)' : style.color }}
+        >
+          {isTheory ? '📖' : style.symbol}
         </span>
-        {moveNumber} — {style.label}
+        {moveNumber} — {isTheory ? `이론수 (엔진 평가: ${style.label})` : style.label}
         {isMine ? '' : ' (상대)'}
       </p>
+      {isTheory && (
+        <p className={styles.theory}>
+          📖 이론수 — 많은 사람이 두어 온 정석 수순 안의 수예요. 오프닝 단계에서는 이렇게 두면
+          충분해요.
+        </p>
+      )}
       <p>{style.explanation}</p>
       {move.allowedMate && <p>⚠️ 이 수 다음 상대에게 강제 메이트가 생겼어요.</p>}
       {move.missedMate && <p>💡 메이트로 끝낼 수 있는 기회가 있었어요.</p>}

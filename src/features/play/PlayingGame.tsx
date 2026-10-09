@@ -22,6 +22,7 @@ import { useLazyEngineClient } from '../board/engine/useLazyEngineClient';
 import { MoveList } from '../board/MoveList';
 import { useChessGame } from '../board/useChessGame';
 import { useMoveNavigationKeys } from '../board/useMoveNavigationKeys';
+import { OpeningLabel } from '../../shared/OpeningLabel';
 import { buildGamePgn } from './gamePgn';
 import styles from './Play.module.css';
 import { useAiOpponent } from './useAiOpponent';
@@ -244,6 +245,8 @@ export function PlayingGame({ record, onNewGame, onRematch }: PlayingGameProps) 
               )}
             </p>
           )}
+
+          <OpeningLabel line={game.line} />
 
           <MoveList
             startFen={game.line.startFen}

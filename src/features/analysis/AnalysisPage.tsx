@@ -17,6 +17,7 @@ import { useEngineAnalysis } from '../board/engine/useEngineAnalysis';
 import { MoveList } from '../board/MoveList';
 import { useChessGame } from '../board/useChessGame';
 import { useMoveNavigationKeys } from '../board/useMoveNavigationKeys';
+import { OpeningLabel } from '../../shared/OpeningLabel';
 import styles from './AnalysisPage.module.css';
 import { PositionLoader } from './PositionLoader';
 
@@ -122,6 +123,8 @@ export function AnalysisPage() {
             onPlayMove={isOver ? undefined : game.makeMove}
             disabledReason={isOver ? '게임이 끝난 국면이에요' : undefined}
           />
+
+          <OpeningLabel line={game.line} uptoPly={game.ply} />
 
           <MoveList
             startFen={game.line.startFen}

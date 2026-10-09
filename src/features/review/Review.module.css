@@ -295,6 +295,11 @@
   text-align: center;
 }
 
+.theory {
+  color: var(--color-book);
+  font-weight: 600;
+}
+
 .whyBox {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,259 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1080px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.small {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.notice {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-inaccuracy) 15%, transparent);
+}
+
+.linkButton {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-accent-strong);
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabs button {
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: none;
+  font-weight: 600;
+}
+
+.tabActive,
+.tabs .tabActive:hover:not(:disabled) {
+  border-bottom-color: var(--color-accent);
+  background: none;
+  color: var(--color-accent-strong);
+}
+
+/* ---------- 레퍼토리 목록 ---------- */
+.listWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 860px;
+}
+
+.dueBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-inaccuracy);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-inaccuracy) 12%, transparent);
+}
+
+.dueButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.lineList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.lineMain {
+  display: flex;
+  flex: 1 1 300px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---------- 탐색기 / 드릴 공통 ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 600px) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.boardColumn {
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.candidates button {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+.candidateName {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressRow progress {
+  flex: 1;
+  height: 10px;
+  accent-color: var(--color-accent);
+}
+
+.prompt {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-weight: 700;
+}
+
+.feedbackGood,
+.feedbackBad,
+.feedbackInfo {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 2px solid;
+  background: var(--color-surface);
+}
+
+.feedbackGood {
+  border-color: var(--color-best);
+}
+
+.feedbackBad {
+  border-color: var(--color-blunder);
+}
+
+.feedbackInfo {
+  border-color: var(--color-border);
+}
+
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 2px solid var(--color-accent);
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.resultTitle {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

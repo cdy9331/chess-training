@@ -7,6 +7,7 @@
     "postinstall": "node scripts/copy-engine.ts",
     "engine:copy": "node scripts/copy-engine.ts",
     "data:puzzles": "node scripts/build-puzzles.ts",
+    "data:openings": "node scripts/build-openings.ts",
     "predev": "node scripts/copy-engine.ts",
     "dev": "vite",
     "prebuild": "node scripts/copy-engine.ts",

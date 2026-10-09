@@ -50,6 +50,15 @@ export interface PuzzleAttemptRecord {
   usedHelp: boolean;
 }
 
+export interface OpeningProgressRecord {
+  lineId: string;
+  box: number;
+  due: number;
+  reps: number;
+  lapses: number;
+  lastReviewedAt: number;
+}
+
 /** 여러 기능이 쓰는 작은 설정·상태 값 (퍼즐 레이팅 등) */
 export interface KeyValueRecord {
   key: string;
@@ -62,6 +71,7 @@ export type ChessTrainingDb = Dexie & {
   engineCache: EntityTable<EngineCacheRecord, 'key'>;
   puzzleAttempts: EntityTable<PuzzleAttemptRecord, 'id'>;
   kv: EntityTable<KeyValueRecord, 'key'>;
+  openingProgress: EntityTable<OpeningProgressRecord, 'lineId'>;
 };
 
 export function createDb(name = 'chess-training'): ChessTrainingDb {
@@ -79,6 +89,10 @@ export function createDb(name = 'chess-training'): ChessTrainingDb {
   db.version(3).stores({
     puzzleAttempts: '++id, puzzleId, at',
     kv: 'key',
+  });
+  // v4: 오프닝 레퍼토리 복습 일정 (새 테이블만 추가)
+  db.version(4).stores({
+    openingProgress: 'lineId, due',
   });
   return db;
 }

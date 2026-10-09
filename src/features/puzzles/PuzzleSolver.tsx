@@ -15,6 +15,7 @@ import {
   type PuzzleProgress,
 } from '../../core/puzzles';
 import { puzzlesRepo } from '../../db/repos/puzzles';
+import { useTimers } from '../../shared/useTimers';
 import { Board, type BoardArrow } from '../board/Board';
 import { puzzleLoader } from './puzzleData';
 import { criteriaFor, type PuzzleMode } from './puzzleMode';
@@ -52,24 +53,6 @@ interface PuzzleSolverProps {
   rating: Glicko;
   onRated: (rating: Glicko) => void;
   onBackToMenu: () => void;
-}
-
-/** 예약한 setTimeout을 퍼즐이 바뀌거나 화면을 떠날 때 한꺼번에 취소한다. */
-function useTimers() {
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
-  const clear = useCallback(() => {
-    for (const t of timers.current) clearTimeout(t);
-    timers.current.clear();
-  }, []);
-  const schedule = useCallback((fn: () => void, ms: number) => {
-    const t = setTimeout(() => {
-      timers.current.delete(t);
-      fn();
-    }, ms);
-    timers.current.add(t);
-  }, []);
-  useEffect(() => clear, [clear]);
-  return { schedule, clear };
 }
 
 export function PuzzleSolver({ mode, rating, onRated, onBackToMenu }: PuzzleSolverProps) {

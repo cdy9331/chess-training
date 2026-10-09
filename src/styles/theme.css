@@ -22,6 +22,7 @@
   --board-mark: rgb(235 97 80 / 0.8);
 
   /* 수 등급 색 (Phase 4 리뷰에서 사용) */
+  --color-book: #a2784f;
   --color-best: #5b9a3c;
   --color-good: #8bb46a;
   --color-inaccuracy: #e5b02e;
