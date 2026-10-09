@@ -59,6 +59,15 @@ export interface OpeningProgressRecord {
   lastReviewedAt: number;
 }
 
+/** 오프닝 탐색기에서 사용자가 직접 저장한 연습 라인 */
+export interface CustomLineRecord {
+  id: string;
+  name: string;
+  side: 'w' | 'b';
+  movesSan: string[];
+  createdAt: number;
+}
+
 /** 여러 기능이 쓰는 작은 설정·상태 값 (퍼즐 레이팅 등) */
 export interface KeyValueRecord {
   key: string;
@@ -72,6 +81,7 @@ export type ChessTrainingDb = Dexie & {
   puzzleAttempts: EntityTable<PuzzleAttemptRecord, 'id'>;
   kv: EntityTable<KeyValueRecord, 'key'>;
   openingProgress: EntityTable<OpeningProgressRecord, 'lineId'>;
+  customLines: EntityTable<CustomLineRecord, 'id'>;
 };
 
 export function createDb(name = 'chess-training'): ChessTrainingDb {
@@ -93,6 +103,10 @@ export function createDb(name = 'chess-training'): ChessTrainingDb {
   // v4: 오프닝 레퍼토리 복습 일정 (새 테이블만 추가)
   db.version(4).stores({
     openingProgress: 'lineId, due',
+  });
+  // v5: 탐색기에서 저장한 내 연습 라인 (새 테이블만 추가)
+  db.version(5).stores({
+    customLines: 'id, createdAt',
   });
   return db;
 }

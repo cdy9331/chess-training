@@ -53,7 +53,14 @@ describe('오프닝 데이터', () => {
     expect(nextBookMoves(book, afterE5).map((m) => m.san)).toEqual(['Nf3']);
     const afterNc6 = fenAt(lineFromUcis(START_FEN, ['e2e4', 'e7e5', 'g1f3', 'b8c6']), 4);
     expect(nextBookMoves(book, afterNc6)).toEqual([
-      { uci: 'f1c4', san: 'Bc4', opening: { eco: 'C50', name: 'Italian Game' } },
+      {
+        uci: 'f1c4',
+        san: 'Bc4',
+        opening: { eco: 'C50', name: 'Italian Game' },
+        inBook: true,
+        games: 0,
+        share: null,
+      },
     ]);
     expect(
       uciLineToSan(
@@ -61,6 +68,40 @@ describe('오프닝 데이터', () => {
         nextBookMoves(book, START_FEN).map((m) => m.uci),
       ),
     ).toEqual(['e4']);
+  });
+
+  it('대국 통계가 있으면 선택률 높은 순서로, 이름 목록에 없는 인기 수도 포함한다', () => {
+    const epdAfter = (ucis: string[]) =>
+      fenToEpd(fenAt(lineFromUcis(START_FEN, ucis), ucis.length));
+    const book = parseOpeningData(
+      { version: 1, positions: { [epdAfter(['e2e4'])]: ['B00', "King's Pawn Game"] } },
+      {
+        version: 1,
+        games: 1000,
+        minRating: 1400,
+        minCount: 10,
+        counts: {
+          [epdAfter(['e2e4'])]: 500,
+          [epdAfter(['d2d4'])]: 400, // 이름 목록에는 없지만 자주 둔 수
+          [epdAfter(['g1f3'])]: 100,
+        },
+      },
+    );
+    if (!book) throw new Error('book');
+    const moves = nextBookMoves(book, START_FEN);
+    expect(moves.map((m) => [m.san, m.games, m.inBook])).toEqual([
+      ['e4', 500, true],
+      ['d4', 400, false],
+      ['Nf3', 100, false],
+    ]);
+    expect(moves[0]?.share).toBeCloseTo(0.5);
+    expect(book.stats).toEqual({ games: 1000, minRating: 1400, minCount: 10 });
+  });
+
+  it('통계 형식이 다르면 이름만으로 동작한다', () => {
+    const book = parseOpeningData({ version: 1, positions: {} }, { version: 99 });
+    expect(book?.stats).toBeNull();
+    expect(book?.count('x')).toBe(0);
   });
 
   it('오프닝 이름을 한국어로', () => {

@@ -174,10 +174,48 @@
 
 .candidates button {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
   width: 100%;
   text-align: left;
+}
+
+.candidateSan {
+  flex: none;
+  min-width: 3.5em;
+}
+
+.candidateBar {
+  flex: none;
+  width: 70px;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-surface-hover);
+}
+
+.candidateBar span {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.candidateShare {
+  flex: none;
+  min-width: 3em;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.practiceBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px dashed var(--color-accent);
+  border-radius: 10px;
 }
 
 .candidateName {

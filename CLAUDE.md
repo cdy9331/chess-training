@@ -28,7 +28,8 @@ npm run lint
 npm run typecheck
 npm test             # vitest
 npm run engine:copy  # Stockfish 파일을 public/engine/에 복사 (install·dev·build 때 자동 실행, git 제외)
-npm run data:openings   # chess-openings TSV → public/data/openings
+npm run data:openings   # chess-openings TSV → public/data/openings/openings.json
+npm run data:opening-stats  # Lichess 월별 대국(raw-data/games/*.pgn.zst, 양쪽 1400+) → public/data/openings/stats.json (선택률)
 npm run data:puzzles    # Lichess 퍼즐 CSV → public/data/puzzles (raw-data/ 필요)
 ```
 

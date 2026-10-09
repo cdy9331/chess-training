@@ -55,7 +55,7 @@ export function OpeningsPage() {
       {tab === 'repertoire' ? (
         <RepertoireList onStart={(line, mode) => setDrill({ line, mode })} />
       ) : (
-        <OpeningExplorer />
+        <OpeningExplorer onPractice={(line) => setDrill({ line, mode: 'learn' })} />
       )}
     </section>
   );
