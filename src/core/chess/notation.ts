@@ -52,6 +52,21 @@ export function sanToUci(fen: string, san: string): string | null {
   }
 }
 
+/** 수 번호를 붙인 수순 문자열. 예: "12. Nf3 Nc6 13. Bb5", 흑 차례 시작이면 "12... Nc6 13. Bb5" */
+export function formatSanLine(fen: string, sans: readonly string[]): string {
+  const [, side, , , , fullmove] = fen.trim().split(/\s+/);
+  let number = Number(fullmove) || 1;
+  let white = side !== 'b';
+  const parts: string[] = [];
+  sans.forEach((san, i) => {
+    if (white) parts.push(`${number}. ${san}`);
+    else parts.push(i === 0 ? `${number}... ${san}` : san);
+    if (!white) number += 1;
+    white = !white;
+  });
+  return parts.join(' ');
+}
+
 /** UCI 수순을 SAN 수순으로 변환. 중간에 불법 수가 있으면 그 직전까지만 반환. */
 export function uciLineToSan(fen: string, ucis: readonly string[]): string[] {
   const chess = new Chess(fen);

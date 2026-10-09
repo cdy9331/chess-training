@@ -1,0 +1,47 @@
+.bar {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse; /* 흰색 영역이 아래에서부터 차오른다 */
+  flex: none;
+  align-self: stretch; /* 옆의 체스판 높이에 맞춘다 */
+  width: 34px;
+  min-height: 120px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #403d39;
+}
+
+.flipped {
+  flex-direction: column;
+}
+
+.white {
+  background: #f2f2f2;
+  transition: height 0.4s ease;
+}
+
+.label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.top {
+  top: 4px;
+}
+
+.bottom {
+  bottom: 4px;
+}
+
+.onWhite {
+  color: #403d39;
+}
+
+.onBlack {
+  color: #f2f2f2;
+}

@@ -27,6 +27,7 @@ npm run preview      # 빌드 결과 확인 (엔진 WASM 로딩은 반드시 여
 npm run lint
 npm run typecheck
 npm test             # vitest
+npm run engine:copy  # Stockfish 파일을 public/engine/에 복사 (install·dev·build 때 자동 실행, git 제외)
 npm run data:openings   # chess-openings TSV → public/data/openings
 npm run data:puzzles    # Lichess 퍼즐 CSV → public/data/puzzles (raw-data/ 필요)
 ```

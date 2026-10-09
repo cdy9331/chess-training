@@ -314,12 +314,19 @@ interface Lesson {
 
 ### Phase 2 — 엔진 연동과 분석 보드 (F2)
 
-- [ ] `scripts/copy-engine.ts`(postinstall)로 Stockfish lite single-thread 빌드를 `public/engine/`에 복사
-- [ ] `EngineClient`(큐·취소·Promise), `uci.ts` 파서, `score.ts` 정규화 + 테스트(파서·정규화는 모의 출력으로 테스트)
-- [ ] `useEngine` 훅(생성/정리), 평가 막대, 최선 수 화살표, MultiPV 3줄 표시(SAN), depth 표시
-- [ ] FEN/PGN 입력란
+- [x] `scripts/copy-engine.ts`(postinstall)로 Stockfish lite single-thread 빌드를 `public/engine/`에 복사
+- [x] `EngineClient`(큐·취소·Promise), `uci.ts` 파서, `score.ts` 정규화 + 테스트(파서·정규화는 모의 출력으로 테스트)
+- [x] `useEngine` 훅(생성/정리), 평가 막대, 최선 수 화살표, MultiPV 3줄 표시(SAN), depth 표시
+- [x] FEN/PGN 입력란
 
 **완료 기준**: 분석 페이지에서 아무 국면이나 두면 1초 내 평가가 갱신되고, 빠르게 수를 바꿔도 이전 결과가 섞이지 않음 / 메이트 국면에서 "M3" 등 표시 / 콘솔 에러 없음 / `npm run preview`(프로덕션 빌드)에서도 엔진 동작
+
+> ✅ 완료 (2026-10-09). Stockfish 19 lite single-thread(wasm 1.8MB) 사용. 훅 이름은 `useEngineAnalysis`. 테스트 43개 통과.
+> 측정: 첫 평가 표시 약 0.6~0.8초(엔진 로딩 포함), 시작 국면 깊이 18 완료 약 3.6초.
+> 브라우저 확인: 빠르게 6수를 두는 동안 매 순간 후보 수가 해당 국면 차례와 일치(결과 섞임 없음), M1 / -M1 표시,
+> 메이트 후 평가 막대 "0-1", 불가능한 FEN 거부, PGN 불러오기, 엔진 끄기/켜기, 페이지 이탈 시 Worker 종료(생성 1·종료 1),
+> 프로덕션 빌드(`npm run preview`)·모바일 레이아웃.
+> `public/engine/`은 설치 시 자동 생성되므로 git에서 제외. 후보 수순을 누르면 그 첫 수를 두는 기능 추가.
 
 ### Phase 3 — AI 대국 (F3)
 

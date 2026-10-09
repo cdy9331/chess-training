@@ -3,11 +3,13 @@ import {
   createLine,
   fenAt,
   fenToEpd,
+  formatSanLine,
   isPromotionMove,
   isValidFen,
   legalTargets,
   lineToPgn,
   parsePgn,
+  parsePositionInput,
   parseUci,
   playMove,
   sanToUci,
@@ -51,6 +53,12 @@ describe('notation', () => {
     const promoFen = '3r4/4P3/8/8/8/8/8/k6K w - - 0 1';
     expect(uciToSan(promoFen, 'e7d8n')).toBe('exd8=N');
     expect(sanToUci(promoFen, 'e8=Q+')).toBe('e7e8q');
+  });
+
+  it('수 번호를 붙인 수순 문자열을 만든다', () => {
+    expect(formatSanLine(START_FEN, ['e4', 'e5', 'Nf3'])).toBe('1. e4 e5 2. Nf3');
+    const blackFen = 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 3 12';
+    expect(formatSanLine(blackFen, ['Nf6', 'Bc4', 'Bc5'])).toBe('12... Nf6 13. Bc4 Bc5');
   });
 
   it('수순을 SAN으로 바꾸고 불법 수에서 멈춘다', () => {
@@ -148,5 +156,34 @@ describe('pgn', () => {
 
   it('잘못된 PGN은 null', () => {
     expect(parsePgn('1. e4 e5 2. Ke3')).toBeNull();
+  });
+});
+
+describe('parsePositionInput', () => {
+  it('FEN을 인식한다', () => {
+    const fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3';
+    expect(parsePositionInput(`  ${fen}\n`)).toEqual({ kind: 'fen', line: createLine(fen) });
+  });
+
+  it('PGN을 인식한다 (헤더가 없어도 됨)', () => {
+    const result = parsePositionInput('1. e4 e5 2. Nf3 Nc6 3. Bb5');
+    expect(result.kind).toBe('pgn');
+    if (result.kind === 'pgn') expect(result.line.moves).toHaveLength(5);
+  });
+
+  it('잘못된 입력은 이유와 함께 거부한다', () => {
+    expect(parsePositionInput('').kind).toBe('error');
+    expect(parsePositionInput('8/8/8/8/8/8/8/8 w - - 0 1').kind).toBe('error'); // 킹 없음
+    expect(
+      parsePositionInput('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR x KQkq - 0 1').kind,
+    ).toBe('error');
+    expect(parsePositionInput('1. e4 e5 2. Ke3').kind).toBe('error');
+  });
+
+  it('둘 차례가 아닌 쪽이 체크당한 불가능한 국면을 거부한다', () => {
+    // 흑 킹이 백 퀸에게 체크당했는데 백 차례
+    const result = parsePositionInput('4k3/8/8/8/8/8/8/4QK2 w - - 0 1');
+    expect(result.kind).toBe('error');
+    if (result.kind === 'error') expect(result.message).toContain('차례');
   });
 });

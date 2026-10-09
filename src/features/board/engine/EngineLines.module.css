@@ -1,0 +1,84 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.meta {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-blunder);
+  font-size: 0.9rem;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  text-align: left;
+}
+
+.score {
+  flex: none;
+  min-width: 3.6em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreWhite {
+  background: #f2f2f2;
+  color: #403d39;
+  border: 1px solid var(--color-border);
+}
+
+.scoreBlack {
+  background: #403d39;
+  color: #f2f2f2;
+}
+
+.pv {
+  min-width: 0; /* 긴 수순이 패널 너비를 늘리지 않고 말줄임표로 잘리게 한다 */
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

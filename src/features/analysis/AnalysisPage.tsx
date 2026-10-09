@@ -1,14 +1,21 @@
 import { useState } from 'react';
-import { describeStatus, lineToPgn } from '../../core/chess';
-import { Board, type Orientation } from '../board/Board';
+import { describeStatus, lineToPgn, parseUci, statusToResult } from '../../core/chess';
+import { Board, type BoardArrow, type Orientation } from '../board/Board';
+import { EngineLines } from '../board/engine/EngineLines';
+import { EvalBar } from '../board/engine/EvalBar';
+import { useEngineAnalysis } from '../board/engine/useEngineAnalysis';
 import { MoveList } from '../board/MoveList';
 import { useChessGame } from '../board/useChessGame';
 import { useMoveNavigationKeys } from '../board/useMoveNavigationKeys';
 import styles from './AnalysisPage.module.css';
+import { PositionLoader } from './PositionLoader';
+
+const BEST_MOVE_ARROW_COLOR = 'rgba(30, 110, 200, 0.8)';
 
 export function AnalysisPage() {
   const game = useChessGame();
   const [orientation, setOrientation] = useState<Orientation>('white');
+  const [engineEnabled, setEngineEnabled] = useState(true);
   const [copied, setCopied] = useState(false);
   /** 클립보드 권한이 막혀 자동 복사에 실패했을 때 직접 복사하도록 보여줄 PGN */
   const [manualPgn, setManualPgn] = useState<string | null>(null);
@@ -21,6 +28,14 @@ export function AnalysisPage() {
   });
 
   const isOver = game.status.kind !== 'ongoing';
+  const analysis = useEngineAnalysis(game.fen, { enabled: engineEnabled && !isOver });
+  const result = statusToResult(game.status);
+
+  const bestLine = analysis.lines[0];
+  const bestMove = bestLine?.pv[0] ? parseUci(bestLine.pv[0]) : null;
+  const arrows: BoardArrow[] = bestMove
+    ? [{ from: bestMove.from, to: bestMove.to, color: BEST_MOVE_ARROW_COLOR }]
+    : [];
 
   async function copyPgn() {
     const pgn = lineToPgn(game.line);
@@ -39,19 +54,30 @@ export function AnalysisPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>분석 보드</h1>
         <p className={styles.description}>
-          백과 흑을 번갈아 직접 두어 보세요. 엔진 평가는 다음 단계(Phase 2)에서 추가돼요.
+          직접 두거나 국면을 불러와서 엔진(Stockfish)의 평가를 확인해 보세요. 파란 화살표가 엔진이
+          고른 최선의 수예요.
         </p>
       </header>
 
       <div className={styles.layout}>
         <div className={styles.boardColumn}>
-          <Board
-            fen={game.fen}
-            orientation={orientation}
-            onMove={game.makeMove}
-            interactive={!isOver}
-            lastMoveUci={game.lastMoveUci}
-          />
+          {engineEnabled && (
+            <EvalBar
+              score={bestLine?.score ?? null}
+              orientation={orientation}
+              result={result === '*' ? undefined : result}
+            />
+          )}
+          <div className={styles.board}>
+            <Board
+              fen={game.fen}
+              orientation={orientation}
+              onMove={game.makeMove}
+              interactive={!isOver}
+              lastMoveUci={game.lastMoveUci}
+              arrows={engineEnabled ? arrows : []}
+            />
+          </div>
         </div>
 
         <aside className={styles.panel}>
@@ -67,6 +93,15 @@ export function AnalysisPage() {
               이전 국면을 보고 있어요. 여기서 수를 두면 이후 수는 지워져요.
             </p>
           )}
+
+          <EngineLines
+            fen={game.fen}
+            analysis={analysis}
+            enabled={engineEnabled}
+            onToggle={setEngineEnabled}
+            onPlayMove={isOver ? undefined : game.makeMove}
+            disabledReason={isOver ? '게임이 끝난 국면이에요' : undefined}
+          />
 
           <MoveList
             startFen={game.line.startFen}
@@ -136,6 +171,8 @@ export function AnalysisPage() {
               </button>
             </div>
           )}
+
+          <PositionLoader currentFen={game.fen} onLoad={game.load} />
         </aside>
       </div>
     </section>

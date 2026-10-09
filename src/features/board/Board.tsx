@@ -25,6 +25,15 @@ export interface BoardProps {
   /** false면 기물을 움직일 수 없다 (다른 수를 보고 있을 때, 상대 차례일 때 등). */
   interactive?: boolean;
   lastMoveUci?: string;
+  /** 보드 위에 그릴 화살표 (예: 엔진 최선 수) */
+  arrows?: BoardArrow[];
+}
+
+export interface BoardArrow {
+  from: string;
+  to: string;
+  /** SVG에 그대로 쓰이므로 CSS 변수는 쓸 수 없다. */
+  color: string;
 }
 
 interface PendingPromotion {
@@ -54,6 +63,7 @@ export function Board({
   onMove,
   interactive = true,
   lastMoveUci,
+  arrows,
 }: BoardProps) {
   // 선택 상태는 어떤 국면에서 만든 것인지 함께 저장해, 국면이 바뀌면 자동으로 무효가 되게 한다.
   const [selection, setSelection] = useState<{ fen: string; square: Square } | null>(null);
@@ -117,6 +127,7 @@ export function Board({
     darkSquareStyle: { backgroundColor: 'var(--board-dark)' },
     allowDragging: canMove,
     allowDrawingArrows: true,
+    arrows: arrows?.map((a) => ({ startSquare: a.from, endSquare: a.to, color: a.color })) ?? [],
     animationDurationInMs: 200,
     canDragPiece: ({ piece }) => canMove && ownsPiece(piece.pieceType),
     onPieceDrag: () => setSelection(null),
