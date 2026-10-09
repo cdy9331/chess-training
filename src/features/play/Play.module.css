@@ -301,3 +301,34 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- 위협 코칭 ---------- */
+.coach {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-size: 0.9rem;
+}
+
+.coach label {
+  font-weight: 700;
+}
+
+.coach ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.dangerText {
+  color: var(--board-danger);
+  font-weight: 700;
+}
+
+.checkText {
+  color: rgb(150 70 200);
+  font-weight: 700;
+}

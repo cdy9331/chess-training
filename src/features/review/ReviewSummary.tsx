@@ -1,6 +1,6 @@
 import type { Color } from 'chess.js';
 import type { GameReview } from '../../core/review';
-import { MOVE_CLASS_ORDER, MOVE_CLASS_STYLE } from './moveClassStyle';
+import { MOVE_CLASS_ORDER, MOVE_CLASS_STYLE } from '../../shared/moveClassStyle';
 import styles from './Review.module.css';
 
 interface ReviewSummaryProps {

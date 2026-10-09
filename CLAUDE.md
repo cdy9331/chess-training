@@ -27,6 +27,7 @@ npm run preview      # 빌드 결과 확인 (엔진 WASM 로딩은 반드시 여
 npm run lint
 npm run typecheck
 npm test             # vitest
+npm run test:e2e     # Playwright 스모크 (빌드→preview, PC에 설치된 Edge 사용 · PW_CHANNEL=chrome 가능)
 npm run engine:copy  # Stockfish 파일을 public/engine/에 복사 (install·dev·build 때 자동 실행, git 제외)
 npm run data:openings   # chess-openings TSV → public/data/openings/openings.json
 npm run data:opening-stats  # Lichess 월별 대국(raw-data/games/*.pgn.zst, 양쪽 1400+) → public/data/openings/stats.json (선택률)

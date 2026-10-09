@@ -10,6 +10,7 @@ interface PuzzleMenuProps {
   mode: PuzzleMode;
   onChangeMode: (mode: PuzzleMode) => void;
   onStart: () => void;
+  onStartRush: () => void;
 }
 
 interface Stats {
@@ -17,7 +18,7 @@ interface Stats {
   solved: number;
 }
 
-export function PuzzleMenu({ rating, mode, onChangeMode, onStart }: PuzzleMenuProps) {
+export function PuzzleMenu({ rating, mode, onChangeMode, onStart, onStartRush }: PuzzleMenuProps) {
   const [index, setIndex] = useState<PuzzleIndex | null>(null);
   const [indexError, setIndexError] = useState(false);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -147,6 +148,9 @@ export function PuzzleMenu({ rating, mode, onChangeMode, onStart }: PuzzleMenuPr
       <div>
         <button type="button" className={styles.primary} onClick={onStart} disabled={!index}>
           퍼즐 시작
+        </button>{' '}
+        <button type="button" onClick={onStartRush} disabled={!index}>
+          ⚡ 퍼즐 러시 (3분/5분)
         </button>
       </div>
     </section>

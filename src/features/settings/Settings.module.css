@@ -1,0 +1,91 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 760px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.small {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-accent-strong);
+}
+
+.inlineButton {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+.danger {
+  border-color: color-mix(in srgb, var(--color-blunder) 50%, var(--color-border));
+}
+
+.dangerButton {
+  border-color: var(--color-blunder);
+  color: var(--color-blunder);
+  font-weight: 700;
+}
+
+.ok,
+.error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.ok {
+  background: var(--color-accent-soft);
+}
+
+.error {
+  background: color-mix(in srgb, var(--color-blunder) 15%, transparent);
+}

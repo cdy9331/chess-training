@@ -14,13 +14,14 @@ export interface SrsState {
 const DAY = 24 * 60 * 60 * 1000;
 /** 상자별 복습 간격(일). 틀린 것(상자 0)은 다음 날 다시 본다. */
 export const BOX_INTERVAL_DAYS = [1, 2, 4, 8, 16, 32] as const;
+export const MAX_BOX = BOX_INTERVAL_DAYS.length - 1;
 
 export function initialSrs(now: number): SrsState {
   return { box: 0, due: now, reps: 0, lapses: 0 };
 }
 
 export function reviewSrs(state: SrsState, correct: boolean, now: number): SrsState {
-  const box = correct ? Math.min(state.box + 1, BOX_INTERVAL_DAYS.length - 1) : 0;
+  const box = correct ? Math.min(state.box + 1, MAX_BOX) : 0;
   const days = BOX_INTERVAL_DAYS[box] ?? 1;
   return {
     box,

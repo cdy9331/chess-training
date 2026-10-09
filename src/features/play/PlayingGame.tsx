@@ -10,7 +10,9 @@ import {
   resignOutcome,
   resultFor,
   sideToMove,
+  PIECE_NAME,
   statusAt,
+  threatsAgainst,
   type GameOutcome,
 } from '../../core/chess';
 import { getLevel, isAbortError } from '../../core/engine';
@@ -30,6 +32,8 @@ import { useAiOpponent } from '../board/engine/useAiOpponent';
 /** AI가 너무 빨리 두면 수를 알아보기 어려우므로 최소한 이만큼은 기다린다. */
 const MIN_AI_THINK_MS = 600;
 const HINT_ARROW_COLOR = 'rgba(40, 160, 70, 0.85)';
+const CHECK_ARROW_COLOR = 'rgba(150, 70, 200, 0.75)';
+const CAPTURE_ARROW_COLOR = 'rgba(220, 50, 50, 0.7)';
 
 interface PlayingGameProps {
   record: GameRecord;
@@ -57,6 +61,8 @@ export function PlayingGame({ record, onNewGame, onRematch }: PlayingGameProps) 
   const [drawPending, setDrawPending] = useState(false);
   const [hint, setHint] = useState<{ fen: string; uci: string } | null>(null);
   const [hintLoading, setHintLoading] = useState(false);
+  /** 연습 모드 위협 코칭: 위험한 내 기물과 상대가 둘 수 있는 체크·잡기를 표시 */
+  const [showThreats, setShowThreats] = useState(record.practice);
 
   useMoveNavigationKeys({
     first: game.goFirst,
@@ -180,6 +186,17 @@ export function PlayingGame({ record, onNewGame, onRematch }: PlayingGameProps) 
     ? [{ from: hintMove.from, to: hintMove.to, color: HINT_ARROW_COLOR }]
     : [];
 
+  const coaching = record.practice && showThreats && myTurn && game.isAtEnd;
+  const threats = coaching ? threatsAgainst(endFen, player) : null;
+  if (threats) {
+    const hangingSquares = new Set<string>(threats.hanging.map((h) => h.square));
+    for (const m of threats.checks) arrows.push({ ...m, color: CHECK_ARROW_COLOR });
+    // 모든 잡기를 그리면 복잡하므로 위험한 기물을 노리는 잡기만 그린다
+    for (const m of threats.captures) {
+      if (hangingSquares.has(m.to)) arrows.push({ ...m, color: CAPTURE_ARROW_COLOR });
+    }
+  }
+
   return (
     <section className={styles.page}>
       <header className={styles.gameHeader}>
@@ -199,6 +216,7 @@ export function PlayingGame({ record, onNewGame, onRematch }: PlayingGameProps) 
             interactive={myTurn && game.isAtEnd}
             lastMoveUci={game.lastMoveUci}
             arrows={arrows}
+            dangerSquares={threats?.hanging.map((h) => h.square)}
           />
         </div>
 
@@ -312,6 +330,42 @@ export function PlayingGame({ record, onNewGame, onRematch }: PlayingGameProps) 
           )}
 
           {hintMove && <p className={styles.info}>초록 화살표가 엔진이 추천하는 수예요.</p>}
+
+          {record.practice && !outcome && (
+            <div className={styles.coach}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={showThreats}
+                  onChange={(e) => setShowThreats(e.target.checked)}
+                />{' '}
+                ⚠ 위협 보기
+              </label>
+              {threats && (
+                <ul>
+                  {threats.hanging.length > 0 ? (
+                    <li>
+                      <span className={styles.dangerText}>빨간 테두리</span>: 위험한 내 기물 —{' '}
+                      {threats.hanging.map((h) => `${PIECE_NAME[h.type]}(${h.square})`).join(', ')}
+                    </li>
+                  ) : (
+                    <li>공짜로 잡힐 내 기물은 없어요.</li>
+                  )}
+                  {threats.checks.length > 0 && (
+                    <li>
+                      <span className={styles.checkText}>보라 화살표</span>: 상대가 둘 수 있는 체크{' '}
+                      {threats.checks.length}개
+                    </li>
+                  )}
+                  {threats.captures.some((c) => threats.hanging.some((h) => h.square === c.to)) && (
+                    <li>
+                      <span className={styles.dangerText}>빨간 화살표</span>: 상대가 노리는 잡기
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
         </aside>
       </div>
     </section>

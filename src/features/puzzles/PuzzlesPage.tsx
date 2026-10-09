@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import type { Glicko } from '../../core/puzzles';
 import { puzzlesRepo } from '../../db/repos/puzzles';
 import { PuzzleMenu } from './PuzzleMenu';
+import { PuzzleRush } from './PuzzleRush';
 import { loadPuzzleMode, savePuzzleMode, type PuzzleMode } from './puzzleMode';
 import { PuzzleSolver } from './PuzzleSolver';
 
 export function PuzzlesPage() {
   const [rating, setRating] = useState<Glicko | null>(null);
-  const [mode, setMode] = useState<PuzzleMode>(loadPuzzleMode);
-  const [solving, setSolving] = useState(false);
+  const [searchParams] = useSearchParams();
+  // 홈의 약점 추천에서 ?theme=fork 처럼 테마를 정해서 들어올 수 있다
+  const [mode, setMode] = useState<PuzzleMode>(() => {
+    const theme = searchParams.get('theme');
+    return theme ? { kind: 'theme', theme } : loadPuzzleMode();
+  });
+  const [view, setView] = useState<'menu' | 'solve' | 'rush'>(() =>
+    searchParams.get('rush') ? 'rush' : 'menu',
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,13 +34,15 @@ export function PuzzlesPage() {
   if (error) return <p>{error}</p>;
   if (!rating) return null;
 
-  if (solving) {
+  if (view === 'rush') return <PuzzleRush onExit={() => setView('menu')} />;
+
+  if (view === 'solve') {
     return (
       <PuzzleSolver
         mode={mode}
         rating={rating}
         onRated={setRating}
-        onBackToMenu={() => setSolving(false)}
+        onBackToMenu={() => setView('menu')}
       />
     );
   }
@@ -44,7 +55,8 @@ export function PuzzlesPage() {
         setMode(m);
         savePuzzleMode(m);
       }}
-      onStart={() => setSolving(true)}
+      onStart={() => setView('solve')}
+      onStartRush={() => setView('rush')}
     />
   );
 }

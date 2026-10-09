@@ -4,3 +4,5 @@ export * from './gameStatus';
 export * from './notation';
 export * from './pgn';
 export * from './positionInput';
+export * from './pgnImport';
+export * from './threats';

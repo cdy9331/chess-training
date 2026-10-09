@@ -1,5 +1,6 @@
 import { Chess, type Color, type PieceSymbol, type Square } from 'chess.js';
 import { playUci } from '../chess/notation';
+import { hangingPieces, PIECE_NAME, PIECE_VALUE } from '../chess/threats';
 import type { PositionEval } from './positionEval';
 
 /**
@@ -7,24 +8,30 @@ import type { PositionEval } from './positionEval';
  * 엔진이 계산한 수순(pv)을 실제로 따라가며 기물 득실·메이트·무방비 기물·포크·체크를 찾아 문장으로 바꾼다.
  */
 
-const VALUE: Record<PieceSymbol, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-const NAME: Record<PieceSymbol, string> = {
-  p: '폰',
-  n: '나이트',
-  b: '비숍',
-  r: '룩',
-  q: '퀸',
-  k: '킹',
-};
+const VALUE = PIECE_VALUE;
+const NAME = PIECE_NAME;
 
 /** 기물 득실을 볼 때 따라가는 수순 길이. 짝수면 "내 수"로 끝나 되잡기까지 포함한다. */
 const MATERIAL_PLIES = 4;
 /** 이 정도 이상 기물 차이가 나야 "이득/손해"로 설명한다 (폰 1 = 1점) */
 const MATERIAL_THRESHOLD = 2;
 
+/** 나쁜 수의 이유 종류. 약점 통계와 레슨 추천에 쓴다. */
+export type MistakeTag =
+  | 'allowedMate' // 상대에게 메이트를 허용
+  | 'hangingPiece' // 기물을 공짜로 내줌 / 무방비 기물
+  | 'allowedFork' // 상대에게 포크를 허용
+  | 'materialLoss' // 수순 끝에 기물 손해
+  | 'missedMate' // 메이트 기회를 놓침
+  | 'missedWin' // 기물을 얻을 기회를 놓침
+  | 'openingPrinciple' // 오프닝 원칙 위반 (이른 퀸·킹 이동)
+  | 'positional'; // 눈에 띄는 전술 없이 형세가 나빠짐
+
 export interface Explanation {
   /** 핵심 이유 문장 (중요한 것부터, 최대 3개 정도) */
   reasons: string[];
+  /** 이유 종류 (나쁜 수 설명에만 채워진다) */
+  tags: MistakeTag[];
 }
 
 /** 조사 '을/를'·'이/가'를 받침에 맞게 붙인다. */
@@ -78,24 +85,6 @@ function playLine(fen: string, ucis: readonly string[], limit = ucis.length) {
     });
   }
   return { chess, steps };
-}
-
-/** 지켜지지 않았거나 더 싼 기물에게 공격받는 color의 기물들 (값 큰 순) */
-function hangingPieces(chess: Chess, color: Color) {
-  const enemy: Color = color === 'w' ? 'b' : 'w';
-  const result: { square: Square; type: PieceSymbol }[] = [];
-  for (const row of chess.board()) {
-    for (const piece of row) {
-      if (!piece || piece.color !== color || piece.type === 'k') continue;
-      const attackers = chess.attackers(piece.square, enemy);
-      if (attackers.length === 0) continue;
-      const defended = chess.attackers(piece.square, color).length > 0;
-      const cheapest = Math.min(...attackers.map((s) => VALUE[chess.get(s)?.type ?? 'q'] || 100));
-      if (!defended || cheapest < VALUE[piece.type])
-        result.push({ square: piece.square, type: piece.type });
-    }
-  }
-  return result.sort((a, b) => VALUE[b.type] - VALUE[a.type]);
 }
 
 /** 방금 움직인 기물이 동시에 공격하는 상대의 귀한 기물들 (포크 판단용) */
@@ -157,10 +146,11 @@ export function explainMistake({
   plyIndex = 99,
 }: MistakeInput): Explanation {
   const reasons: string[] = [];
+  const tags: MistakeTag[] = [];
   const opponent: Color = mover === 'w' ? 'b' : 'w';
   const afterMove = new Chess(fenBefore);
   const played = playUci(afterMove, playedUci);
-  if (!played) return { reasons };
+  if (!played) return { reasons, tags };
   const fenAfter = afterMove.fen();
   const refutation = after.kind === 'score' ? after.pv : [];
 
@@ -168,6 +158,7 @@ export function explainMistake({
   const oppMate = mateLength(after, opponent);
   if (oppMate !== null) {
     const { steps } = playLine(fenAfter, refutation, oppMate * 2 - 1);
+    tags.push('allowedMate');
     reasons.push(
       oppMate === 1
         ? `상대가 ${steps[0]?.san ?? '다음 수'}로 바로 체크메이트할 수 있어요.`
@@ -182,11 +173,13 @@ export function explainMistake({
     const reply = playUci(chess, replyUci);
     if (reply?.captured) {
       const lost = `${reply.to}의 ${NAME[reply.captured]}`;
+      tags.push('hangingPiece');
       reasons.push(`상대가 ${reply.san}로 ${josa(lost, '을', '를')} 잡을 수 있어요.`);
     } else if (reply) {
       const targets = forkTargets(chess, reply.to);
       if (targets.length >= 2) {
         const names = joinNames(targets.map((t) => NAME[t.type]));
+        tags.push('allowedFork');
         reasons.push(
           `상대가 ${reply.san}로 ${josa(names, '을', '를')} 동시에 공격하는 포크를 걸 수 있어요. 둘 다 지킬 수는 없어요.`,
         );
@@ -199,6 +192,7 @@ export function explainMistake({
     const hanging = hangingPieces(afterMove, mover)[0];
     if (hanging && VALUE[hanging.type] >= 3) {
       const label = pieceLabel(hanging.square, hanging.type);
+      tags.push('hangingPiece');
       reasons.push(`${josa(label, '이', '가')} 공격받고 있는데 제대로 지켜지지 않아요.`);
     }
   }
@@ -208,6 +202,7 @@ export function explainMistake({
   const refuted = playLine(fenAfter, refutation, MATERIAL_PLIES - 1);
   const lossAfterLine = startBalance - balance(refuted.chess, mover);
   if (oppMate === null && lossAfterLine >= MATERIAL_THRESHOLD) {
+    tags.push('materialLoss');
     reasons.push(
       `상대의 최선 수순(${formatLineSan(refuted.steps)})대로 가면 기물을 약 ${lossAfterLine}점(폰=1, 나이트·비숍=3, 룩=5, 퀸=9) 잃어요.`,
     );
@@ -216,10 +211,12 @@ export function explainMistake({
   // 4-1) 오프닝 원칙 위반 (기물 손해가 없을 때 초보자가 가장 이해하기 쉬운 이유)
   if (reasons.length === 0 && plyIndex < OPENING_PLIES) {
     if (played.piece === 'q' && !played.captured) {
+      tags.push('openingPrinciple');
       reasons.push(
         '오프닝에서 퀸을 너무 일찍 꺼냈어요. 상대가 기물을 전개하면서 퀸을 쫓아내 시간(템포)을 벌 수 있어요.',
       );
     } else if (played.piece === 'k' && !played.isKingsideCastle() && !played.isQueensideCastle()) {
+      tags.push('openingPrinciple');
       reasons.push(
         '킹을 움직여서 캐슬링을 할 수 없게 됐어요. 오프닝에서는 캐슬링으로 킹을 지키는 게 좋아요.',
       );
@@ -231,6 +228,7 @@ export function explainMistake({
   const bestLine = before.kind === 'score' ? before.pv : [];
   if (myMate !== null && mateLength(after, mover) === null) {
     const { steps } = playLine(fenBefore, bestLine, 1);
+    tags.push('missedMate');
     reasons.push(
       myMate === 1
         ? `${steps[0]?.san ?? '다른 수'}를 두면 바로 체크메이트였어요!`
@@ -240,6 +238,7 @@ export function explainMistake({
     const best = playLine(fenBefore, bestLine, MATERIAL_PLIES);
     const gain = balance(best.chess, mover) - startBalance;
     if (gain >= MATERIAL_THRESHOLD) {
+      tags.push('missedWin');
       reasons.push(
         `${best.steps[0]?.san}를 뒀다면 기물을 약 ${gain}점 얻을 수 있었어요 (${formatLineSan(best.steps)}).`,
       );
@@ -247,12 +246,13 @@ export function explainMistake({
   }
 
   if (reasons.length === 0) {
+    tags.push('positional');
     reasons.push(
       '당장 기물을 잃지는 않지만, 엔진이 끝까지 계산해 보니 상대에게 더 좋은 기회를 주는 수예요. ' +
         '최선 수순과 상대의 응수를 따라가 비교해 보세요.',
     );
   }
-  return { reasons: reasons.slice(0, 3) };
+  return { reasons: reasons.slice(0, 3), tags: [...new Set(tags)] };
 }
 
 export interface BestMoveInput {
@@ -272,13 +272,13 @@ export function explainBestMove({
   plyIndex,
 }: BestMoveInput): Explanation {
   const reasons: string[] = [];
-  if (before.kind !== 'score' || !before.pv[0]) return { reasons };
+  if (before.kind !== 'score' || !before.pv[0]) return { reasons, tags: [] };
   const bestUci = before.pv[0];
   const opponent: Color = mover === 'w' ? 'b' : 'w';
   const start = new Chess(fenBefore);
   const chess = new Chess(fenBefore);
   const move = playUci(chess, bestUci);
-  if (!move) return { reasons };
+  if (!move) return { reasons, tags: [] };
 
   // 1) 메이트
   const myMate = mateLength(before, mover);
@@ -289,7 +289,7 @@ export function explainBestMove({
         ? `${move.san}는 바로 체크메이트예요!`
         : `${myMate}수 만에 체크메이트로 이어져요: ${formatLineSan(steps, myMate * 2 - 1)}`,
     );
-    return { reasons };
+    return { reasons, tags: [] };
   }
 
   // 2) 잡기
@@ -363,5 +363,5 @@ export function explainBestMove({
         '아래 "수순 따라가 보기"로 이후 진행을 확인해 보세요.',
     );
   }
-  return { reasons: reasons.slice(0, 3) };
+  return { reasons: reasons.slice(0, 3), tags: [] };
 }

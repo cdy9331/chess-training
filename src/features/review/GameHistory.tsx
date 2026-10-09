@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { describeEndReason, resultFor } from '../../core/chess';
-import { getLevel } from '../../core/engine';
 import { gamesRepo } from '../../db/repos/games';
 import type { GameRecord } from '../../db/schema';
 import { formatDateTime } from '../../shared/format';
+import { gameTitle } from './gameTitle';
+import { PgnImport } from './PgnImport';
 import styles from './Review.module.css';
 
 type LoadState = { kind: 'loading' } | { kind: 'error' } | { kind: 'loaded'; games: GameRecord[] };
@@ -36,9 +37,11 @@ export function GameHistory() {
     <section className={styles.page}>
       <h1 className={styles.title}>게임 리뷰</h1>
       <p className={styles.muted}>
-        지난 대국을 골라 다시 볼 수 있어요. 수마다 평가해 주는 리뷰 기능은 다음 단계(Phase 4)에서
-        추가돼요.
+        지난 대국을 골라 수마다 평가를 받아 보세요. 다른 사이트에서 둔 대국도 PGN으로 가져와 리뷰할
+        수 있어요.
       </p>
+
+      <PgnImport />
 
       {state.kind === 'loading' && <p className={styles.muted}>불러오는 중…</p>}
       {state.kind === 'error' && <p className={styles.error}>대국 기록을 불러오지 못했어요.</p>}
@@ -62,7 +65,8 @@ export function GameHistory() {
                   </span>
                   <span className={styles.gameMain}>
                     <strong>
-                      vs 레벨 {game.aiLevel} ({getLevel(game.aiLevel).label})
+                      {game.source === 'import' && '📥 '}
+                      {gameTitle(game)}
                     </strong>
                     <span className={styles.muted}>
                       {game.playerColor === 'w' ? '백' : '흑'} ·{' '}

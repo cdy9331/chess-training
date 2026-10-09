@@ -1,6 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { GameEndReason, GameResult } from '../core/chess';
-import type { GameReview, PositionEval } from '../core/review';
+import type { GameReview, MistakeTag, PositionEval } from '../core/review';
 
 export interface GameRecord {
   id: number;
@@ -20,6 +20,15 @@ export interface GameRecord {
   endReason?: GameEndReason;
   /** 끝난 게임만 채워진다 */
   pgn?: string;
+  /** PGN으로 가져온 대국의 정보 (source === 'import'). 인덱스가 아니라서 스키마 버전은 그대로다. */
+  importInfo?: ImportInfo;
+}
+
+export interface ImportInfo {
+  white: string;
+  black: string;
+  event?: string;
+  date?: string;
 }
 
 export interface ReviewRecord {
@@ -77,6 +86,32 @@ export interface LessonProgressRecord {
   updatedAt: number;
 }
 
+/** 리뷰에서 나온 내 실수·블런더. 다시 풀어 보는 복습 문제가 된다. */
+export interface MistakeRecord {
+  /** `${gameId}:${ply}` */
+  id: string;
+  gameId: number;
+  ply: number;
+  /** 실수하기 직전 국면 (내 차례) */
+  fen: string;
+  playedUci: string;
+  playedSan: string;
+  bestUci: string;
+  bestSan: string;
+  classification: 'mistake' | 'blunder';
+  /** 수를 두기 전 국면의 엔진 평가 (다시 풀 때 판정 기준) */
+  evalBefore: PositionEval;
+  reasons: string[];
+  tags: MistakeTag[];
+  createdAt: number;
+  // 간격 반복
+  box: number;
+  due: number;
+  reps: number;
+  lapses: number;
+  lastReviewedAt?: number;
+}
+
 /** 여러 기능이 쓰는 작은 설정·상태 값 (퍼즐 레이팅 등) */
 export interface KeyValueRecord {
   key: string;
@@ -92,6 +127,7 @@ export type ChessTrainingDb = Dexie & {
   openingProgress: EntityTable<OpeningProgressRecord, 'lineId'>;
   customLines: EntityTable<CustomLineRecord, 'id'>;
   lessonProgress: EntityTable<LessonProgressRecord, 'lessonId'>;
+  mistakes: EntityTable<MistakeRecord, 'id'>;
 };
 
 export function createDb(name = 'chess-training'): ChessTrainingDb {
@@ -121,6 +157,10 @@ export function createDb(name = 'chess-training'): ChessTrainingDb {
   // v6: 레슨 진도 (새 테이블만 추가)
   db.version(6).stores({
     lessonProgress: 'lessonId',
+  });
+  // v7: 리뷰에서 나온 실수 복습 (새 테이블만 추가)
+  db.version(7).stores({
+    mistakes: 'id, due, gameId, createdAt',
   });
   return db;
 }

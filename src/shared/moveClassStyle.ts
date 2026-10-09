@@ -1,4 +1,4 @@
-import type { MoveClass } from '../../core/review';
+import type { MoveClass } from '../core/review';
 
 export interface MoveClassStyle {
   label: string;

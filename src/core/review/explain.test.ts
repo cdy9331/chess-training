@@ -44,6 +44,36 @@ describe('explainMistake', () => {
     expect(reasons[0]).toBe('상대가 Qh4#로 바로 체크메이트할 수 있어요.');
   });
 
+  it('이유 종류(태그)를 함께 돌려준다', () => {
+    const line = lineFromUcis(START_FEN, ['e2e4', 'e7e5', 'd1h5', 'b8c6']);
+    const queenBlunder = explainMistake({
+      fenBefore: fenAt(line, 4),
+      playedUci: 'h5e5',
+      mover: 'w',
+      before: score(30, ['f1c4', 'd8e7']),
+      after: score(-900, ['c6e5', 'd2d4', 'e5c6']),
+    });
+    expect(queenBlunder.tags).toEqual(['hangingPiece', 'materialLoss']);
+
+    const fork = explainMistake({
+      fenBefore: '4k3/8/8/8/1n6/8/7P/R3K3 w - - 0 1',
+      playedUci: 'h2h3',
+      mover: 'w',
+      before: score(200, ['a1a4']),
+      after: score(-300, ['b4c2']),
+    });
+    expect(fork.tags).toContain('allowedFork');
+
+    const quiet = explainMistake({
+      fenBefore: START_FEN,
+      playedUci: 'a2a3',
+      mover: 'w',
+      before: score(30, ['e2e4']),
+      after: score(-10, ['e7e5']),
+    });
+    expect(quiet.tags).toEqual(['positional']);
+  });
+
   it('상대에게 포크를 허용하면 알려준다', () => {
     const { reasons } = explainMistake({
       fenBefore: '4k3/8/8/8/1n6/8/7P/R3K3 w - - 0 1',

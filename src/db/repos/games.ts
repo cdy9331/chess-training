@@ -1,5 +1,5 @@
 import type { GameOutcome } from '../../core/chess';
-import { db as defaultDb, type ChessTrainingDb, type GameRecord } from '../schema';
+import { db as defaultDb, type ChessTrainingDb, type GameRecord, type ImportInfo } from '../schema';
 
 export type NewGameInput = Pick<
   GameRecord,
@@ -60,6 +60,29 @@ export function createGamesRepo(db: ChessTrainingDb = defaultDb) {
       });
     },
 
+    /** PGN으로 가져온 대국을 끝난 대국으로 저장한다 (바로 리뷰할 수 있게). */
+    async importGame(input: {
+      startFen: string;
+      movesUci: readonly string[];
+      playerColor: GameRecord['playerColor'];
+      result: GameRecord['result'];
+      endReason?: GameRecord['endReason'];
+      pgn: string;
+      importInfo: ImportInfo;
+    }): Promise<number> {
+      const now = Date.now();
+      return db.games.add({
+        ...input,
+        movesUci: [...input.movesUci],
+        source: 'import',
+        status: 'finished',
+        aiLevel: 0,
+        practice: false,
+        createdAt: now,
+        updatedAt: now,
+      });
+    },
+
     async get(id: number): Promise<GameRecord | undefined> {
       const record: unknown = await db.games.get(id);
       return isGameRecord(record) ? record : undefined;
@@ -80,9 +103,10 @@ export function createGamesRepo(db: ChessTrainingDb = defaultDb) {
 
     /** 대국과 그 리뷰를 함께 지운다. */
     async remove(id: number): Promise<void> {
-      await db.transaction('rw', db.games, db.reviews, async () => {
+      await db.transaction('rw', db.games, db.reviews, db.mistakes, async () => {
         await db.games.delete(id);
         await db.reviews.delete(id);
+        await db.mistakes.where('gameId').equals(id).delete();
       });
     },
   };

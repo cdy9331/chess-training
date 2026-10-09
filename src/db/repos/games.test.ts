@@ -67,3 +67,23 @@ describe('gamesRepo', () => {
     expect(await repo.get(id)).toBeUndefined();
   });
 });
+
+describe('PGN 가져오기', () => {
+  it('끝난 대국으로 저장되고 정보가 남는다', async () => {
+    const { repo } = setup();
+    const id = await repo.importGame({
+      startFen: START_FEN,
+      movesUci: ['e2e4', 'e7e5'],
+      playerColor: 'b',
+      result: '1/2-1/2',
+      pgn: '1. e4 e5 1/2-1/2',
+      importInfo: { white: 'A', black: 'B' },
+    });
+    expect(await repo.get(id)).toMatchObject({
+      source: 'import',
+      status: 'finished',
+      playerColor: 'b',
+      importInfo: { white: 'A', black: 'B' },
+    });
+  });
+});

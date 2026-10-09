@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { lineFromUcis } from '../../core/chess';
 import { reviewGame, type GameReview, type ReviewProgress } from '../../core/review';
+import { mistakesRepo } from '../../db/repos/mistakes';
 import { engineCache, reviewsRepo } from '../../db/repos/reviews';
+import { settingsRepo } from '../../db/repos/settings';
 import type { GameRecord } from '../../db/schema';
 import { useLazyEngineClient } from '../board/engine/useLazyEngineClient';
 
@@ -35,13 +37,18 @@ export function useGameReview(game: GameRecord) {
       const saved = runToken === 0 ? await reviewsRepo.get(game.id) : undefined;
       if (controller.signal.aborted) return;
       if (saved) {
-        setState({ kind: 'done', review: saved });
+        // 실수 복습이 생기기 전에 리뷰한 게임도 실수를 모아 둔다 (이미 있으면 건너뜀)
+        await mistakesRepo.saveFromReview(game, saved).catch(() => 0);
+        if (!controller.signal.aborted) setState({ kind: 'done', review: saved });
         return;
       }
+      const depth = await settingsRepo.getReviewDepth();
+      if (controller.signal.aborted) return;
       setState({ kind: 'analyzing', progress: { done: 0, total: game.movesUci.length + 1 } });
       const client = getClient();
       try {
         const review = await reviewGame(client, line, {
+          depth,
           cache: engineCache,
           signal: controller.signal,
           onProgress: (progress) => {
@@ -49,6 +56,7 @@ export function useGameReview(game: GameRecord) {
           },
         });
         await reviewsRepo.save(game.id, review);
+        await mistakesRepo.saveFromReview(game, review);
         if (!controller.signal.aborted) setState({ kind: 'done', review });
       } catch {
         if (controller.signal.aborted) return;

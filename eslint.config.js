@@ -7,7 +7,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-  globalIgnores(['dist', 'coverage', 'public/engine']),
+  globalIgnores(['dist', 'coverage', 'public/engine', 'test-results', 'playwright-report']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -22,7 +22,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['scripts/**/*.ts', '*.config.{ts,js}'],
+    files: ['scripts/**/*.ts', 'e2e/**/*.ts', '*.config.{ts,js}'],
     languageOptions: { globals: globals.node },
   },
   prettier,

@@ -5,7 +5,7 @@ import {
   type PositionEval,
   type ReviewedMove,
 } from '../../core/review';
-import { MOVE_CLASS_STYLE } from './moveClassStyle';
+import { MOVE_CLASS_STYLE } from '../../shared/moveClassStyle';
 import styles from './Review.module.css';
 
 export type RetryState =

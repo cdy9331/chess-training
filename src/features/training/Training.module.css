@@ -1,0 +1,245 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1080px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.small {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.linkButton {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-accent-strong);
+}
+
+.mistake {
+  color: var(--color-mistake);
+  font-weight: 700;
+}
+
+.blunder {
+  color: var(--color-blunder);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.emptyBox,
+.dueBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.emptyBox p {
+  margin: 0;
+}
+
+.dueBox {
+  border-color: var(--color-mistake);
+  background: color-mix(in srgb, var(--color-mistake) 10%, transparent);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.cardMain {
+  display: flex;
+  flex: 1 1 260px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ---------- 복습 ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 600px) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.boardColumn {
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 600px;
+}
+
+.progressRow progress {
+  flex: 1;
+  height: 10px;
+  accent-color: var(--color-accent);
+}
+
+.prompt {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-weight: 700;
+}
+
+.feedbackGood,
+.feedbackBad,
+.feedbackInfo {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.feedbackGood {
+  background: color-mix(in srgb, var(--color-best) 18%, transparent);
+}
+
+.feedbackBad {
+  background: color-mix(in srgb, var(--color-blunder) 15%, transparent);
+}
+
+.feedbackInfo {
+  background: var(--color-accent-soft);
+}
+
+.explain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.explain ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.resultTitle {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ---------- 좌표 훈련 ---------- */
+.coordBoard {
+  position: relative;
+}
+
+.coordTarget {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  padding: 4px 18px;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 4rem;
+  font-weight: 800;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.bigScore {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}

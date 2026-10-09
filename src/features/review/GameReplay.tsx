@@ -9,7 +9,7 @@ import {
   resultFor,
   uciToSan,
 } from '../../core/chess';
-import { getLevel, isAbortError } from '../../core/engine';
+import { isAbortError } from '../../core/engine';
 import {
   analyzePosition,
   classifyMove,
@@ -35,9 +35,10 @@ import { useMoveNavigationKeys } from '../board/useMoveNavigationKeys';
 import { EvalGraph } from './EvalGraph';
 import { LinePreview } from './LinePreview';
 import { MoveFeedback, type PreviewKind, type RetryState } from './MoveFeedback';
-import { BEST_ARROW_COLOR, MOVE_CLASS_STYLE } from './moveClassStyle';
+import { BEST_ARROW_COLOR, MOVE_CLASS_STYLE } from '../../shared/moveClassStyle';
 import styles from './Review.module.css';
 import { ReviewSummary } from './ReviewSummary';
+import { gameTitle } from './gameTitle';
 import { useGameReview } from './useGameReview';
 
 /** 다시 두어보기에서 사용자의 수를 판정할 때의 탐색 깊이 */
@@ -87,12 +88,10 @@ function GameReviewView({ game }: { game: GameRecord }) {
     <section className={styles.page}>
       <Link to="/review">← 대국 목록</Link>
       <header>
-        <h1 className={styles.title}>
-          게임 리뷰 · vs 레벨 {game.aiLevel} ({getLevel(game.aiLevel).label})
-        </h1>
+        <h1 className={styles.title}>게임 리뷰 · {gameTitle(game)}</h1>
         <p className={styles.muted}>
-          {formatDateTime(game.createdAt)} · {game.playerColor === 'w' ? '백' : '흑'} · 결과{' '}
-          {game.result}
+          {formatDateTime(game.createdAt)} · {game.source === 'import' ? '내 쪽: ' : ''}
+          {game.playerColor === 'w' ? '백' : '흑'} · 결과 {game.result}
           {mine !== 'ongoing' && ` (${RESULT_TEXT[mine]})`}
           {game.endReason && ` · ${describeEndReason(game.endReason)}`}
         </p>

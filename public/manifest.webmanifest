@@ -1,0 +1,12 @@
+{
+  "name": "체스 트레이닝",
+  "short_name": "체스 트레이닝",
+  "description": "초보자를 위한 체스 학습 앱 — AI 대국, 게임 리뷰, 퍼즐, 오프닝, 레슨",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#769656",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

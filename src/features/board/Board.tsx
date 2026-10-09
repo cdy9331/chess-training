@@ -29,6 +29,12 @@ export interface BoardProps {
   arrows?: BoardArrow[];
   /** 강조할 칸 (예: 퍼즐 힌트로 움직일 기물) */
   highlightSquares?: readonly string[];
+  /** 위험 표시할 칸 (연습 모드의 위협 코칭: 공격받는 내 기물) */
+  dangerSquares?: readonly string[];
+  /** 칸을 누를 때마다 알린다 (좌표 훈련 등 수를 두지 않는 화면용) */
+  onSquareClick?: (square: string) => void;
+  /** 가장자리 좌표(a~h, 1~8) 표시. 좌표 훈련에서 끈다. */
+  showNotation?: boolean;
 }
 
 export interface BoardArrow {
@@ -58,6 +64,7 @@ const SQUARE_STYLES = {
     backgroundImage: 'radial-gradient(circle, var(--board-check) 0%, transparent 75%)',
   },
   highlight: { boxShadow: 'inset 0 0 0 4px var(--board-highlight)' },
+  danger: { boxShadow: 'inset 0 0 0 4px var(--board-danger)' },
   mark: { backgroundColor: 'var(--board-mark)' },
 } satisfies Record<string, CSSProperties>;
 
@@ -97,6 +104,9 @@ export function Board({
   lastMoveUci,
   arrows,
   highlightSquares,
+  dangerSquares,
+  onSquareClick,
+  showNotation = true,
 }: BoardProps) {
   // 선택 상태는 어떤 국면에서 만든 것인지 함께 저장해, 국면이 바뀌면 자동으로 무효가 되게 한다.
   const [selection, setSelection] = useState<{ fen: string; square: Square } | null>(null);
@@ -163,6 +173,9 @@ export function Board({
     for (const square of markedSquares) {
       result[square] = { ...result[square], ...SQUARE_STYLES.mark };
     }
+    for (const square of dangerSquares ?? []) {
+      result[square] = { ...result[square], ...SQUARE_STYLES.danger };
+    }
     for (const square of highlightSquares ?? []) {
       result[square] = { ...result[square], ...SQUARE_STYLES.highlight };
     }
@@ -176,11 +189,12 @@ export function Board({
       }
     }
     return result;
-  }, [fen, lastMoveUci, selected, targets, highlightSquares, markedSquares]);
+  }, [fen, lastMoveUci, selected, targets, highlightSquares, dangerSquares, markedSquares]);
 
   const options: ChessboardOptions = {
     position: fen,
     boardOrientation: orientation,
+    showNotation,
     squareStyles,
     lightSquareStyle: { backgroundColor: 'var(--board-light)' },
     darkSquareStyle: { backgroundColor: 'var(--board-dark)' },
@@ -198,6 +212,7 @@ export function Board({
     // 우클릭: 칸 표시 켜기/끄기, 우클릭 드래그: 화살표(라이브러리 기능), 왼쪽 클릭: 표시 지우기
     onSquareRightClick: ({ square }) => toggleMark(square),
     onSquareClick: ({ piece, square }) => {
+      onSquareClick?.(square);
       if (markedSquares.length > 0) setMarks({ fen, squares: [] });
       if (!canMove || pendingPromotion) return;
       const sq = square as Square;

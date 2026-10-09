@@ -6,6 +6,9 @@ import { OpeningsPage } from '../features/openings/OpeningsPage';
 import { PlayPage } from '../features/play/PlayPage';
 import { PuzzlesPage } from '../features/puzzles/PuzzlesPage';
 import { ReviewPage } from '../features/review/ReviewPage';
+import { SettingsPage } from '../features/settings/SettingsPage';
+import { CoordinatesPage } from '../features/training/CoordinatesPage';
+import { MistakesPage } from '../features/training/MistakesPage';
 import { Layout } from './Layout';
 import { NotFoundPage } from './NotFoundPage';
 
@@ -22,7 +25,10 @@ export const routes: RouteObject[] = [
       { path: 'openings', element: <OpeningsPage /> },
       { path: 'lessons', element: <LessonsPage /> },
       { path: 'lessons/:lessonId', element: <LessonsPage /> },
+      { path: 'mistakes', element: <MistakesPage /> },
+      { path: 'coordinates', element: <CoordinatesPage /> },
       { path: 'analysis', element: <AnalysisPage /> },
+      { path: 'settings', element: <SettingsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
