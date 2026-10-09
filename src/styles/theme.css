@@ -1,0 +1,48 @@
+/* 색상 토큰. 컴포넌트는 색을 직접 쓰지 말고 이 변수만 사용한다. */
+:root {
+  color-scheme: light;
+  --color-bg: #f6f5f2;
+  --color-surface: #ffffff;
+  --color-surface-hover: #efede8;
+  --color-border: #e2dfd8;
+  --color-text: #22211f;
+  --color-text-muted: #6b6862;
+  --color-accent: #769656;
+  --color-accent-soft: #e6eedd;
+  --color-accent-strong: #4b6b30;
+
+  /* 수 등급 색 (Phase 4 리뷰에서 사용) */
+  --color-best: #5b9a3c;
+  --color-good: #8bb46a;
+  --color-inaccuracy: #e5b02e;
+  --color-mistake: #e5822e;
+  --color-blunder: #d23c3c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-bg: #1c1b19;
+    --color-surface: #262522;
+    --color-surface-hover: #312f2b;
+    --color-border: #3a3834;
+    --color-text: #ecebe8;
+    --color-text-muted: #a8a59e;
+    --color-accent: #8db36a;
+    --color-accent-soft: #2f3a26;
+    --color-accent-strong: #b5d696;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #1c1b19;
+  --color-surface: #262522;
+  --color-surface-hover: #312f2b;
+  --color-border: #3a3834;
+  --color-text: #ecebe8;
+  --color-text-muted: #a8a59e;
+  --color-accent: #8db36a;
+  --color-accent-soft: #2f3a26;
+  --color-accent-strong: #b5d696;
+}

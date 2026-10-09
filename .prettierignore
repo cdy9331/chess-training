@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+public/engine
+public/data
+package-lock.json
