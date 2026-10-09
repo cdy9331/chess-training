@@ -11,6 +11,14 @@
   --color-accent-soft: #e6eedd;
   --color-accent-strong: #4b6b30;
 
+  /* 체스판 (밝기와 상관없이 같은 색을 쓴다) */
+  --board-light: #eeeed2;
+  --board-dark: #769656;
+  --board-last-move: rgb(246 246 105 / 0.75);
+  --board-selected: rgb(20 85 30 / 0.5);
+  --board-target: rgb(20 85 30 / 0.45);
+  --board-check: rgb(230 30 30 / 0.9);
+
   /* 수 등급 색 (Phase 4 리뷰에서 사용) */
   --color-best: #5b9a3c;
   --color-good: #8bb46a;

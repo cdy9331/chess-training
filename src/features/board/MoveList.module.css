@@ -1,0 +1,60 @@
+.list {
+  position: relative; /* 버튼의 offsetTop 기준을 목록으로 맞춘다 */
+  max-height: 320px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 3em 1fr 1fr;
+  align-items: center;
+}
+
+.row:nth-child(even) {
+  background: var(--color-surface-hover);
+}
+
+.number {
+  padding-left: 8px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell {
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.move {
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.move:hover {
+  background: var(--color-accent-soft);
+}
+
+.active,
+.active:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.empty {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-muted);
+}
