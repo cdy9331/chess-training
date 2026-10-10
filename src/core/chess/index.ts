@@ -6,3 +6,4 @@ export * from './pgn';
 export * from './positionInput';
 export * from './pgnImport';
 export * from './threats';
+export * from './moveSound';

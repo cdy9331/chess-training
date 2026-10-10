@@ -4,6 +4,7 @@ import { db as defaultDb, type ChessTrainingDb } from '../schema';
 
 const REVIEW_DEPTH_KEY = 'reviewDepth';
 const DAILY_GOAL_KEY = 'dailyGoal';
+const MOVE_SOUND_KEY = 'moveSound';
 /** 리뷰 분석 깊이 범위: 낮으면 빠르지만 덜 정확하다 */
 export const REVIEW_DEPTH_MIN = 10;
 export const REVIEW_DEPTH_MAX = 20;
@@ -28,6 +29,14 @@ export function createSettingsRepo(db: ChessTrainingDb = defaultDb) {
     async setDailyGoal(goal: number): Promise<void> {
       if (!DAILY_GOAL_OPTIONS.some((o) => o === goal)) return;
       await db.kv.put({ key: DAILY_GOAL_KEY, value: goal });
+    },
+    /** 착수 효과음 (기본 켬) */
+    async getMoveSound(): Promise<boolean> {
+      const value = (await db.kv.get(MOVE_SOUND_KEY))?.value;
+      return typeof value === 'boolean' ? value : true;
+    },
+    async setMoveSound(on: boolean): Promise<void> {
+      await db.kv.put({ key: MOVE_SOUND_KEY, value: on });
     },
   };
 }

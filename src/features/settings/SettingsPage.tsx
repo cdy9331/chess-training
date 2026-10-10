@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_REVIEW_DEPTH } from '../../core/review';
 import { backupRepo, isBackupFile, type BackupFile } from '../../db/repos/backup';
 import { REVIEW_DEPTH_MAX, REVIEW_DEPTH_MIN, settingsRepo } from '../../db/repos/settings';
+import { isMoveSoundEnabled, playMoveSound, setMoveSoundEnabled } from '../../shared/moveSounds';
 import styles from './Settings.module.css';
 
 type Message = { kind: 'ok' | 'error'; text: string } | null;
@@ -32,6 +33,7 @@ export function SettingsPage() {
   const [persist, setPersist] = useState<Persist | null>(null);
   const [message, setMessage] = useState<Message>(null);
   const [busy, setBusy] = useState(false);
+  const [sound, setSound] = useState(isMoveSoundEnabled);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -54,6 +56,13 @@ export function SettingsPage() {
       cancelled = true;
     };
   }, []);
+
+  function changeSound(on: boolean) {
+    setSound(on);
+    setMoveSoundEnabled(on);
+    if (on) playMoveSound('move');
+    settingsRepo.setMoveSound(on).catch(() => undefined);
+  }
 
   async function changeDepth(value: number) {
     setDepth(value);
@@ -162,6 +171,24 @@ export function SettingsPage() {
           {message.text}
         </p>
       )}
+
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>소리</h2>
+        <label className={styles.row}>
+          <input type="checkbox" checked={sound} onChange={(e) => changeSound(e.target.checked)} />
+          착수 효과음
+        </label>
+        <p className={styles.small}>
+          기물을 둘 때 "톡" 소리가 나요. 잡을 때는 더 묵직하게, 체크일 때는 "띵" 소리가 함께 나요.
+        </p>
+        <div className={styles.actions}>
+          {(['move', 'capture', 'castle', 'check'] as const).map((kind) => (
+            <button key={kind} type="button" disabled={!sound} onClick={() => playMoveSound(kind)}>
+              🔊 {{ move: '착수', capture: '잡기', castle: '캐슬링', check: '체크' }[kind]}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className={styles.card}>
         <h2 className={styles.cardTitle}>게임 리뷰</h2>

@@ -76,5 +76,8 @@ describe('settingsRepo', () => {
     await repo.setDailyGoal(20);
     await repo.setDailyGoal(7);
     expect(await repo.getDailyGoal()).toBe(20);
+    expect(await repo.getMoveSound()).toBe(true);
+    await repo.setMoveSound(false);
+    expect(await repo.getMoveSound()).toBe(false);
   });
 });

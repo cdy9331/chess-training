@@ -1,5 +1,5 @@
 import type { CSSProperties, RefObject } from 'react';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard, type ChessboardOptions } from 'react-chessboard';
 import type { Square } from 'chess.js';
 import {
@@ -9,9 +9,11 @@ import {
   legalTargetsDetailed,
   parseUci,
   sideToMove,
+  soundForTransition,
   toUci,
   type PromotionPiece,
 } from '../../core/chess';
+import { playMoveSound } from '../../shared/moveSounds';
 import styles from './Board.module.css';
 import { PromotionDialog } from './PromotionDialog';
 
@@ -112,6 +114,17 @@ export function Board({
   const [selection, setSelection] = useState<{ fen: string; square: Square } | null>(null);
   const [pending, setPending] = useState<PendingPromotion | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // 착수음: 국면이 정확히 한 수(lastMoveUci) 진행됐을 때만 낸다.
+  // 내 수·상대 수·퍼즐·리뷰 넘겨보기 모두 이 한 곳에서 처리된다.
+  const prevFenRef = useRef(fen);
+  useEffect(() => {
+    const prevFen = prevFenRef.current;
+    prevFenRef.current = fen;
+    if (prevFen === fen) return;
+    const kind = soundForTransition(prevFen, fen, lastMoveUci);
+    if (kind) playMoveSound(kind);
+  }, [fen, lastMoveUci]);
   const hasSize = useHasSize(wrapperRef);
   // 우클릭으로 표시한 칸 (생각을 정리하는 용도). 국면이 바뀌면 사라진다.
   const [marks, setMarks] = useState<{ fen: string; squares: readonly string[] }>({
